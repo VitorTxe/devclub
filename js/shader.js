@@ -1,104 +1,124 @@
-(function() {
-  const canvas = document.getElementById('shader-canvas-ANIMATION_1');
-  if (!canvas) {
-    console.warn('Canvas do shader não encontrado.');
-    return;
-  }
+(function () {
+  const canvas = document.getElementById("shader-canvas-ANIMATION_1");
+  if (!canvas) return;
 
-  // Ajusta o buffer de desenho WebGL para corresponder ao tamanho de layout CSS.
-  function syncSize() {
-    const w = canvas.clientWidth  || 1280;
-    const h = canvas.clientHeight || 720;
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width  = w;
-      canvas.height = h;
-    }
-  }
-
-  if (typeof ResizeObserver !== 'undefined') {
-    new ResizeObserver(syncSize).observe(canvas);
-  }
-  syncSize();
-
-  // Inicialização robusta do contexto WebGL com tratamento de erro
+  const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let reduceMotion = reduceMotionQuery.matches;
   let gl;
+
   try {
-    gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  } catch (e) {
-    console.error('Erro ao obter contexto WebGL para o shader:', e);
+    gl = canvas.getContext("webgl", { alpha: true, antialias: false }) || canvas.getContext("experimental-webgl");
+  } catch (error) {
+    console.error("Erro ao obter contexto WebGL para o hero:", error);
   }
 
   if (!gl) {
-    console.warn('WebGL não suportado pelo navegador. Utilizando fallback visual via CSS.');
-    canvas.style.display = 'none';
-    const parent = canvas.parentElement;
-    if (parent) {
-      parent.classList.add('bg-gradient-to-b', 'from-[#08090B]', 'to-[#0E1013]');
-    }
+    canvas.style.display = "none";
     return;
   }
 
-  // Shaders Sources
-  const vs = `
+  const vertexSource = `
     attribute vec2 a_position;
     varying vec2 v_texCoord;
+
     void main() {
       v_texCoord = a_position * 0.5 + 0.5;
       gl_Position = vec4(a_position, 0.0, 1.0);
     }
   `;
 
-  const fs = `
+  const fragmentSource = `
     precision highp float;
+
     varying vec2 v_texCoord;
     uniform float u_time;
     uniform vec2 u_resolution;
     uniform vec2 u_mouse;
 
+    float hash(vec2 point) {
+      return fract(sin(dot(point, vec2(127.1, 311.7))) * 43758.5453123);
+    }
+
+    float noise(vec2 point) {
+      vec2 cell = floor(point);
+      vec2 local = fract(point);
+      local = local * local * (3.0 - 2.0 * local);
+
+      return mix(
+        mix(hash(cell), hash(cell + vec2(1.0, 0.0)), local.x),
+        mix(hash(cell + vec2(0.0, 1.0)), hash(cell + vec2(1.0, 1.0)), local.x),
+        local.y
+      );
+    }
+
     void main() {
-        vec2 uv = v_texCoord;
-        
-        // Ruído sutil em movimento para atmosfera tech
-        float noise = sin(uv.x * 10.0 + u_time * 0.5) * cos(uv.y * 10.0 + u_time * 0.5) * 0.02;
-        
-        vec3 color1 = vec3(0.031, 0.035, 0.043); // #08090B
-        vec3 color2 = vec3(0.055, 0.063, 0.075); // Um pouco mais claro
-        
-        vec3 finalColor = mix(color1, color2, uv.y + noise);
-        
-        // Efeito de brilho verde sutil que segue o mouse ou move lentamente
-        vec2 glowPos = u_mouse / u_resolution;
-        
-        // Se o mouse não tiver sido movido ainda, cria uma animação lenta automática
-        if (length(u_mouse) == 0.0) {
-            glowPos = vec2(0.5 + 0.3 * sin(u_time * 0.2), 0.5 + 0.3 * cos(u_time * 0.3));
-        }
+      vec2 uv = v_texCoord;
+      float aspect = u_resolution.x / max(u_resolution.y, 1.0);
+      vec2 point = uv - 0.5;
+      point.x *= aspect;
 
-        float dist = length(uv - glowPos);
-        float glow = smoothstep(0.8, 0.0, dist) * 0.04;
-        finalColor += vec3(0.13, 0.90, 0.42) * glow; 
+      float time = u_time;
+      float softNoise = noise(uv * 5.5 + vec2(time * 0.055, -time * 0.04));
+      float fineNoise = noise(uv * 13.0 - vec2(time * 0.08, time * 0.045));
 
-        gl_FragColor = vec4(finalColor, 1.0);
+      vec3 deep = vec3(0.018, 0.024, 0.022);
+      vec3 surface = vec3(0.035, 0.057, 0.047);
+      vec3 color = mix(deep, surface, uv.y * 0.72 + softNoise * 0.18);
+
+      float waveA = 0.12 * sin(point.x * 2.8 + time * 0.62 + softNoise * 1.6);
+      float waveB = -0.18 + 0.09 * sin(point.x * 4.1 - time * 0.48 + fineNoise * 1.2);
+      float auroraA = exp(-abs(point.y - waveA) * 6.2);
+      float auroraB = exp(-abs(point.y - waveB) * 8.0);
+
+      color += vec3(0.055, 0.82, 0.30) * auroraA * (0.10 + softNoise * 0.08);
+      color += vec3(0.12, 0.55, 0.32) * auroraB * (0.07 + fineNoise * 0.06);
+
+      vec2 glowPosition = u_mouse / max(u_resolution, vec2(1.0));
+      if (length(u_mouse) < 0.001) {
+        glowPosition = vec2(
+          0.5 + 0.28 * sin(time * 0.19),
+          0.5 + 0.22 * cos(time * 0.23)
+        );
+      }
+
+      vec2 glowDistance = (uv - glowPosition) * vec2(aspect, 1.0);
+      float glow = 1.0 - smoothstep(0.0, 0.68, length(glowDistance));
+      float pulse = 0.86 + 0.14 * sin(time * 0.9);
+      color += vec3(0.12, 0.96, 0.38) * glow * 0.20 * pulse;
+
+      vec2 gridCell = fract(uv * vec2(30.0, 18.0));
+      vec2 gridDistance = min(gridCell, 1.0 - gridCell);
+      float grid = 1.0 - smoothstep(0.0, 0.035, min(gridDistance.x, gridDistance.y));
+      float gridMask = 1.0 - smoothstep(0.16, 0.8, length(point));
+      color += vec3(0.18, 0.8, 0.36) * grid * gridMask * 0.027;
+
+      color += (fineNoise - 0.5) * 0.012;
+      float vignette = 1.0 - smoothstep(0.45, 1.05, length(point));
+      color *= 0.74 + vignette * 0.26;
+
+      gl_FragColor = vec4(color, 1.0);
     }
   `;
 
-  function createShader(gl, type, source) {
+  function createShader(type, source) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
+
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      console.error('Erro ao compilar shader:', gl.getShaderInfoLog(shader));
+      console.error("Erro ao compilar shader do hero:", gl.getShaderInfoLog(shader));
       gl.deleteShader(shader);
       return null;
     }
+
     return shader;
   }
 
-  const vertexShader = createShader(gl, gl.VERTEX_SHADER, vs);
-  const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fs);
+  const vertexShader = createShader(gl.VERTEX_SHADER, vertexSource);
+  const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentSource);
 
   if (!vertexShader || !fragmentShader) {
-    console.error('Falha ao compilar shaders. Descontinuando WebGL.');
+    canvas.style.display = "none";
     return;
   }
 
@@ -108,70 +128,122 @@
   gl.linkProgram(program);
 
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error('Erro ao linkar programa WebGL:', gl.getProgramInfoLog(program));
+    console.error("Erro ao linkar shader do hero:", gl.getProgramInfoLog(program));
+    canvas.style.display = "none";
     return;
   }
 
   gl.useProgram(program);
 
-  // Buffer de geometria
   const buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1, -1,
-     1, -1,
-    -1,  1,
-    -1,  1,
-     1, -1,
-     1,  1
+    -1, -1, 1, -1, -1, 1,
+    -1, 1, 1, -1, 1, 1
   ]), gl.STATIC_DRAW);
 
-  const posLocation = gl.getAttribLocation(program, 'a_position');
-  gl.enableVertexAttribArray(posLocation);
-  gl.vertexAttribPointer(posLocation, 2, gl.FLOAT, false, 0, 0);
+  const positionLocation = gl.getAttribLocation(program, "a_position");
+  gl.enableVertexAttribArray(positionLocation);
+  gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
-  // Locators de Uniforms
-  const uTimeLocation = gl.getUniformLocation(program, 'u_time');
-  const uResLocation = gl.getUniformLocation(program, 'u_resolution');
-  const uMouseLocation = gl.getUniformLocation(program, 'u_mouse');
+  const timeLocation = gl.getUniformLocation(program, "u_time");
+  const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+  const mouseLocation = gl.getUniformLocation(program, "u_mouse");
 
-  let mouse = { x: 0, y: 0 };
+  const mouse = { x: 0, y: 0 };
+  const targetMouse = { x: 0, y: 0 };
   let hasMoved = false;
+  let isInView = true;
+  let frameId = null;
 
-  window.addEventListener('mousemove', (event) => {
-    hasMoved = true;
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width && rect.height) {
-      const nx = (event.clientX - rect.left) / rect.width;
-      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
-      mouse.x = nx * canvas.width;
-      mouse.y = ny * canvas.height;
-    }
-  });
+  function syncSize() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+    const width = Math.max(1, Math.round((canvas.clientWidth || 1280) * ratio));
+    const height = Math.max(1, Math.round((canvas.clientHeight || 720) * ratio));
 
-  function render(time) {
-    if (typeof ResizeObserver === 'undefined') syncSize();
-    
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    
-    if (uTimeLocation) {
-      gl.uniform1f(uTimeLocation, time * 0.001);
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
     }
-    if (uResLocation) {
-      gl.uniform2f(uResLocation, canvas.width, canvas.height);
-    }
-    if (uMouseLocation) {
-      // Passa a posição real do mouse ou zero para ativar animação automática
-      if (hasMoved) {
-        gl.uniform2f(uMouseLocation, mouse.x, mouse.y);
-      } else {
-        gl.uniform2f(uMouseLocation, 0.0, 0.0);
-      }
-    }
-    
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-    requestAnimationFrame(render);
   }
 
-  requestAnimationFrame(render);
+  function shouldAnimate() {
+    return isInView && !document.hidden && !reduceMotion;
+  }
+
+  function requestRender() {
+    if (frameId === null) frameId = requestAnimationFrame(render);
+  }
+
+  function stopRender() {
+    if (frameId !== null) cancelAnimationFrame(frameId);
+    frameId = null;
+  }
+
+  function updatePlayback() {
+    if (shouldAnimate()) requestRender();
+    else if (reduceMotion && isInView && !document.hidden) requestRender();
+    else stopRender();
+  }
+
+  function render(timestamp) {
+    frameId = null;
+    syncSize();
+
+    mouse.x += (targetMouse.x - mouse.x) * 0.065;
+    mouse.y += (targetMouse.y - mouse.y) * 0.065;
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform1f(timeLocation, reduceMotion ? 0 : timestamp * 0.001);
+    gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+    gl.uniform2f(mouseLocation, hasMoved ? mouse.x : 0, hasMoved ? mouse.y : 0);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    if (shouldAnimate()) requestRender();
+  }
+
+  canvas.closest("#inicio")?.addEventListener("pointermove", (event) => {
+    if (reduceMotion) return;
+
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    const ratioX = canvas.width / rect.width;
+    const ratioY = canvas.height / rect.height;
+    targetMouse.x = (event.clientX - rect.left) * ratioX;
+    targetMouse.y = (rect.bottom - event.clientY) * ratioY;
+    hasMoved = true;
+  }, { passive: true });
+
+  const resizeObserver = typeof ResizeObserver !== "undefined"
+    ? new ResizeObserver(() => {
+        syncSize();
+        requestRender();
+      })
+    : null;
+
+  resizeObserver?.observe(canvas);
+
+  const visibilityObserver = typeof IntersectionObserver !== "undefined"
+    ? new IntersectionObserver(([entry]) => {
+        isInView = entry.isIntersecting;
+        updatePlayback();
+      }, { rootMargin: "120px" })
+    : null;
+
+  visibilityObserver?.observe(canvas);
+  document.addEventListener("visibilitychange", updatePlayback);
+
+  const handleMotionChange = (event) => {
+    reduceMotion = event.matches;
+    if (reduceMotion) hasMoved = false;
+    updatePlayback();
+  };
+
+  if (typeof reduceMotionQuery.addEventListener === "function") {
+    reduceMotionQuery.addEventListener("change", handleMotionChange);
+  }
+
+  syncSize();
+  requestRender();
 })();

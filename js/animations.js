@@ -36,6 +36,9 @@ function initEntryIntro() {
         if (typeof ScrollTrigger !== "undefined") {
             ScrollTrigger.refresh();
         }
+
+        window.devclubScroll?.resize();
+        window.devclubScroll?.resume();
     };
 
     if (typeof gsap === "undefined") {
@@ -179,115 +182,397 @@ function initAboutAnimation() {
     mm.add(
         {
             reduceMotion: "(prefers-reduced-motion: reduce)",
-            isMobile: "(max-width: 767px)"
+            isMobile: "(max-width: 767px)",
+            isDesktop: "(min-width: 768px)"
         },
         (context) => {
             const { reduceMotion, isMobile } = context.conditions;
-            const reveals = section.querySelectorAll(".about-reveal");
-            const cards = section.querySelectorAll(".about-card-reveal");
-            const timelineItems = section.querySelectorAll(".timeline-item");
-            const processSteps = section.querySelectorAll(".process-step");
+
+            // ── Coleta de elementos ──
+            const intro = section.querySelector(".about-intro");
+            const introCopy = gsap.utils.toArray(".about-intro__copy > *", section);
+            const founderFigure = section.querySelector(".founder-figure");
+            const founderFrame = section.querySelector(".founder-frame");
+            const founderPhoto = section.querySelector(".founder-photo");
+            const founderMeta = gsap.utils.toArray(".founder-caption > span, .founder-tag", section);
+            const founderIndex = section.querySelector(".founder-index");
+            const sectionHeadings = gsap.utils.toArray(".about-section-heading, .process-heading", section);
+            const cards = gsap.utils.toArray(".about-card-reveal", section);
+            const cardIcons = gsap.utils.toArray(".method-card .icon-container", section);
+            const timelineItems = gsap.utils.toArray(".timeline-item", section);
+            const processSteps = gsap.utils.toArray(".process-step", section);
+            const processIcons = gsap.utils.toArray(".process-step__icon", section);
+            const orbs = gsap.utils.toArray(".about-orb", section);
+            const devPath = section.querySelector(".devpath");
             const devPathProgress = section.querySelector(".devpath__progress");
+            const processFlow = section.querySelector(".process-flow");
             const processProgress = section.querySelector(".process-line span");
 
+            const allAnimated = [
+                ...introCopy,
+                founderFigure,
+                founderFrame,
+                ...founderMeta,
+                founderIndex,
+                ...sectionHeadings.flatMap((h) => gsap.utils.toArray(h.children)),
+                ...cards,
+                ...cardIcons,
+                ...timelineItems,
+                ...processSteps,
+                ...processIcons,
+                founderPhoto,
+                ...orbs
+            ].filter(Boolean);
+
+            // ── Reduzir movimento: limpa tudo e retorna ──
             if (reduceMotion) {
-                gsap.set([reveals, cards, timelineItems, processSteps], { clearProps: "all" });
-                gsap.set([devPathProgress, processProgress], { scaleX: 1, scaleY: 1 });
+                gsap.set(allAnimated, { clearProps: "all" });
+                gsap.set([devPathProgress, processProgress].filter(Boolean), { scaleX: 1, scaleY: 1 });
                 timelineItems.forEach((item) => item.classList.add("is-active"));
                 processSteps.forEach((step) => step.classList.add("is-active"));
-                return;
+
+                return () => {
+                    timelineItems.forEach((item) => item.classList.remove("is-active"));
+                    processSteps.forEach((step) => step.classList.remove("is-active"));
+                };
             }
 
-            gsap.set(reveals, { autoAlpha: 0, y: 28 });
-            gsap.set(cards, { autoAlpha: 0, y: 24 });
-            gsap.set(processSteps, { autoAlpha: 0, y: isMobile ? 18 : 22 });
+            // ══════════════════════════════════════════════════════
+            // 1. INTRO — Reveal cinematográfico (copy + founder)
+            // ══════════════════════════════════════════════════════
 
-            ScrollTrigger.batch(reveals, {
-                start: "top 86%",
-                once: true,
-                interval: 0.08,
-                batchMax: 3,
-                onEnter: (batch) => gsap.to(batch, {
-                    autoAlpha: 1,
-                    y: 0,
-                    duration: 0.8,
-                    stagger: 0.1,
-                    ease: "power3.out",
-                    overwrite: "auto"
-                })
+            gsap.set(introCopy, { autoAlpha: 0, y: isMobile ? 26 : 38 });
+            gsap.set(founderFigure, {
+                autoAlpha: 0,
+                y: isMobile ? 40 : 64,
+                scale: 0.94,
+                transformOrigin: "50% 65%"
             });
 
-            ScrollTrigger.batch(cards, {
-                start: "top 88%",
-                once: true,
-                interval: 0.1,
-                batchMax: isMobile ? 1 : 3,
-                onEnter: (batch) => gsap.to(batch, {
-                    autoAlpha: 1,
-                    y: 0,
-                    duration: 0.72,
-                    stagger: 0.1,
-                    ease: "power3.out",
-                    overwrite: "auto"
-                })
+            // Founder frame: clip-path reveal (desktop) ou fade simples (mobile)
+            if (founderFrame && !isMobile) {
+                gsap.set(founderFrame, {
+                    clipPath: "inset(6% 6% 6% 6% round 24px)",
+                    scale: 1.04
+                });
+            }
+
+            gsap.set(founderMeta, { autoAlpha: 0, y: 16 });
+            if (founderIndex) gsap.set(founderIndex, { autoAlpha: 0 });
+
+            const introTl = gsap.timeline({
+                defaults: { ease: "power3.out" },
+                scrollTrigger: {
+                    id: "about-intro",
+                    trigger: intro,
+                    start: "top 78%",
+                    once: true
+                },
+                onComplete: () => {
+                    gsap.set([...introCopy, founderFigure, ...founderMeta], {
+                        clearProps: "transform,opacity,visibility"
+                    });
+                    if (founderFrame && !isMobile) {
+                        gsap.set(founderFrame, { clearProps: "clipPath,transform" });
+                    }
+                    if (founderIndex) gsap.set(founderIndex, { clearProps: "all" });
+                }
             });
 
-            if (devPathProgress) {
-                gsap.to(devPathProgress, {
-                    scaleY: 1,
+            introTl
+                .addLabel("copy")
+                .to(introCopy, {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 0.85,
+                    stagger: 0.1
+                }, "copy")
+                .addLabel("founder", "copy+=0.12")
+                .to(founderFigure, {
+                    autoAlpha: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 1.1,
+                    ease: "power4.out"
+                }, "founder");
+
+            // Clip-path reveal cinematográfico do frame (desktop)
+            if (founderFrame && !isMobile) {
+                introTl.to(founderFrame, {
+                    clipPath: "inset(0% 0% 0% 0% round 24px)",
+                    scale: 1,
+                    duration: 1.3,
+                    ease: "power4.out"
+                }, "founder+=0.06");
+            }
+
+            introTl
+                .to(founderMeta, {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 0.58,
+                    stagger: 0.09
+                }, "founder+=0.55");
+
+            if (founderIndex) {
+                introTl.to(founderIndex, {
+                    autoAlpha: 1,
+                    duration: 0.45
+                }, "founder+=0.7");
+            }
+
+            // ── Parallax interno da foto (desktop) ──
+            if (founderPhoto && founderFrame && !isMobile) {
+                gsap.fromTo(
+                    founderPhoto,
+                    { scale: 1.1, yPercent: -4 },
+                    {
+                        scale: 1.1,
+                        yPercent: 5,
+                        ease: "none",
+                        scrollTrigger: {
+                            id: "about-founder-parallax",
+                            trigger: founderFrame,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: 0.9
+                        }
+                    }
+                );
+            }
+
+            // ══════════════════════════════════════════════════════
+            // 2. ORBS — Parallax profundo com scale progressivo
+            // ══════════════════════════════════════════════════════
+
+            if (orbs.length) {
+                gsap.set(orbs, { scale: 0.6 });
+
+                gsap.to(orbs, {
+                    scale: 1,
+                    xPercent: (index) => index === 0 ? -14 : 12,
+                    yPercent: (index) => index === 0 ? 30 : -24,
                     ease: "none",
                     scrollTrigger: {
-                        trigger: section.querySelector(".devpath"),
-                        start: "top 68%",
-                        end: "bottom 55%",
-                        scrub: 0.6
+                        id: "about-orbs",
+                        trigger: section,
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: 1.4
                     }
                 });
             }
 
-            timelineItems.forEach((item) => {
+            // ══════════════════════════════════════════════════════
+            // 3. SECTION HEADINGS — Reveal sequencial elegante
+            // ══════════════════════════════════════════════════════
+
+            sectionHeadings.forEach((heading, index) => {
+                const children = gsap.utils.toArray(heading.children);
+                gsap.set(children, { autoAlpha: 0, y: isMobile ? 22 : 30 });
+
+                const headingTl = gsap.timeline({
+                    defaults: { ease: "power3.out" },
+                    scrollTrigger: {
+                        id: `about-heading-${index + 1}`,
+                        trigger: heading,
+                        start: "top 84%",
+                        once: true
+                    },
+                    onComplete: () => gsap.set(children, {
+                        clearProps: "transform,opacity,visibility"
+                    })
+                });
+
+                headingTl.to(children, {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 0.75,
+                    stagger: 0.12
+                });
+            });
+
+            // ══════════════════════════════════════════════════════
+            // 4. DEVPATH PROGRESS — Barra vertical scrub
+            // ══════════════════════════════════════════════════════
+
+            if (devPathProgress && devPath) {
+                gsap.fromTo(
+                    devPathProgress,
+                    { scaleY: 0, transformOrigin: "center top" },
+                    {
+                        scaleY: 1,
+                        ease: "none",
+                        scrollTrigger: {
+                            id: "about-path-progress",
+                            trigger: devPath,
+                            start: "top 72%",
+                            end: "bottom 48%",
+                            scrub: 0.65
+                        }
+                    }
+                );
+            }
+
+            // ══════════════════════════════════════════════════════
+            // 5. TIMELINE ITEMS — Reveal com slide + glow no marker
+            // ══════════════════════════════════════════════════════
+
+            gsap.set(timelineItems, { x: isMobile ? 18 : 30 });
+
+            timelineItems.forEach((item, index) => {
+                const marker = item.querySelector(".timeline-item__marker");
+
                 ScrollTrigger.create({
+                    id: `about-timeline-${index + 1}`,
                     trigger: item,
-                    start: "top 58%",
-                    end: "bottom 42%",
-                    onEnter: () => item.classList.add("is-active"),
+                    start: "top 64%",
+                    end: "bottom 40%",
+                    onEnter: () => {
+                        item.classList.add("is-active");
+                        const tl = gsap.timeline({ defaults: { ease: "power3.out", overwrite: "auto" } });
+                        tl.to(item, {
+                            x: 0,
+                            duration: 0.65,
+                            onComplete: () => gsap.set(item, { clearProps: "transform" })
+                        });
+                        if (marker) {
+                            tl.fromTo(marker, {
+                                scale: 0.6,
+                                rotation: -12
+                            }, {
+                                scale: 1,
+                                rotation: 0,
+                                duration: 0.5,
+                                ease: "back.out(2.5)"
+                            }, 0);
+                        }
+                    },
                     onEnterBack: () => item.classList.add("is-active"),
                     onLeave: () => item.classList.remove("is-active"),
                     onLeaveBack: () => item.classList.remove("is-active")
                 });
             });
 
-            if (processProgress && !isMobile) {
-                gsap.to(processProgress, {
-                    scaleX: 1,
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: section.querySelector(".process-flow"),
-                        start: "top 78%",
-                        end: "bottom 60%",
-                        scrub: 0.7
+            // ══════════════════════════════════════════════════════
+            // 6. METHOD CARDS — Stagger profundo + micro-animação ícones
+            // ══════════════════════════════════════════════════════
+
+            gsap.set(cards, {
+                autoAlpha: 0,
+                y: isMobile ? 34 : 48,
+                scale: 0.94
+            });
+
+            gsap.set(cardIcons, {
+                scale: 0.65,
+                rotation: -10,
+                transformOrigin: "center center"
+            });
+
+            ScrollTrigger.batch(cards, {
+                start: "top 88%",
+                once: true,
+                interval: 0.1,
+                batchMax: isMobile ? 1 : 2,
+                onEnter: (batch) => {
+                    gsap.to(batch, {
+                        autoAlpha: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: 0.85,
+                        stagger: 0.14,
+                        ease: "power3.out",
+                        overwrite: "auto",
+                        onComplete: () => gsap.set(batch, {
+                            clearProps: "transform,opacity,visibility"
+                        })
+                    });
+
+                    // Ícones dos cards visíveis neste batch
+                    const batchIcons = batch.map((card) => card.querySelector(".icon-container")).filter(Boolean);
+                    gsap.to(batchIcons, {
+                        scale: 1,
+                        rotation: 0,
+                        duration: 0.6,
+                        stagger: 0.1,
+                        delay: 0.2,
+                        ease: "back.out(3)",
+                        overwrite: "auto",
+                        onComplete: () => gsap.set(batchIcons, { clearProps: "transform" })
+                    });
+                }
+            });
+
+            // ══════════════════════════════════════════════════════
+            // 7. PROCESS LINE — Barra horizontal scrub (desktop)
+            // ══════════════════════════════════════════════════════
+
+            if (processProgress && processFlow && !isMobile) {
+                gsap.fromTo(
+                    processProgress,
+                    { scaleX: 0, transformOrigin: "left center" },
+                    {
+                        scaleX: 1,
+                        ease: "none",
+                        scrollTrigger: {
+                            id: "about-process-progress",
+                            trigger: processFlow,
+                            start: "top 78%",
+                            end: "bottom 58%",
+                            scrub: 0.7
+                        }
                     }
-                });
+                );
             }
 
+            // ══════════════════════════════════════════════════════
+            // 8. PROCESS STEPS — Reveal com ícone rotacional + glow
+            // ══════════════════════════════════════════════════════
+
+            gsap.set(processSteps, { autoAlpha: 0, y: isMobile ? 26 : 36 });
+            gsap.set(processIcons, {
+                scale: 0,
+                rotation: -90,
+                transformOrigin: "center center"
+            });
+
             ScrollTrigger.batch(processSteps, {
-                start: "top 86%",
+                start: "top 87%",
                 once: true,
                 interval: 0.12,
                 batchMax: isMobile ? 1 : 5,
                 onEnter: (batch) => {
                     batch.forEach((step) => step.classList.add("is-active"));
+
                     gsap.to(batch, {
                         autoAlpha: 1,
                         y: 0,
-                        duration: 0.65,
+                        duration: 0.72,
                         stagger: 0.12,
                         ease: "power3.out",
-                        overwrite: "auto"
+                        overwrite: "auto",
+                        onComplete: () => gsap.set(batch, {
+                            clearProps: "transform,opacity,visibility"
+                        })
+                    });
+
+                    // Ícones dos steps: reveal rotacional elástico
+                    const batchIcons = batch.map((step) => step.querySelector(".process-step__icon")).filter(Boolean);
+                    gsap.to(batchIcons, {
+                        scale: 1,
+                        rotation: 0,
+                        duration: 0.7,
+                        stagger: 0.1,
+                        delay: 0.12,
+                        ease: "back.out(2.8)",
+                        overwrite: "auto",
+                        onComplete: () => gsap.set(batchIcons, { clearProps: "transform" })
                     });
                 }
             });
 
+            // ── Cleanup ──
             return () => {
                 timelineItems.forEach((item) => item.classList.remove("is-active"));
                 processSteps.forEach((step) => step.classList.remove("is-active"));
@@ -298,6 +583,7 @@ function initAboutAnimation() {
 
     window.addEventListener("load", () => ScrollTrigger.refresh(), { once: true });
 }
+
 function initFacultyAnimation() {
     const section = document.querySelector(".faculty-showcase");
     if (!section) return;
