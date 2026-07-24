@@ -56,6 +56,78 @@ body {
     background: #343537;
 }
 
+/* Metrics CountUp */
+.metric-item { will-change: transform, opacity; }
+.metric-number { font-variant-numeric: tabular-nums; }
+
+/* Marquee de empresas */
+.metrics-marquee-wrapper {
+    margin-top: clamp(24px, 3vw, 36px);
+    padding-top: clamp(20px, 2.5vw, 32px);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.metrics-marquee-label {
+    margin: 0 0 16px;
+    color: #737975;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    font-weight: 500;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.metrics-marquee {
+    position: relative;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.metrics-marquee__track {
+    display: flex;
+    gap: clamp(32px, 4vw, 56px);
+    width: max-content;
+    animation: marquee-scroll 28s linear infinite;
+    will-change: transform;
+}
+
+.metrics-marquee:hover .metrics-marquee__track {
+    animation-play-state: paused;
+}
+
+.metrics-marquee__logo {
+    flex: 0 0 auto;
+    color: #555a57;
+    font-family: "Geist", sans-serif;
+    font-size: clamp(14px, 1.2vw, 18px);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color 0.3s ease;
+}
+
+.metrics-marquee__logo:hover {
+    color: #a6aca9;
+}
+
+@keyframes marquee-scroll {
+    to {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .metrics-marquee__track {
+        animation: none;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: auto;
+    }
+}
+
 /* Split-Screen Formations Section (Desktop) */
 @media (min-width: 1024px) {
     .split-layout-container {

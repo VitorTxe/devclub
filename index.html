@@ -99,7 +99,7 @@
 
     <!-- Estilos Adicionais Isolados -->
     <link href="https://unpkg.com/lenis@1.3.23/dist/lenis.css" rel="stylesheet">
-    <link href="css/custom.css?v=16" rel="stylesheet">
+    <link href="css/custom.css?v=17" rel="stylesheet">
 
     <!-- GSAP & ScrollTrigger CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -163,7 +163,7 @@
                     O DevClub não é apenas mais um curso. É um sistema completo de evolução desenhado para transformar você em um desenvolvedor profissional, focado na realidade e exigências do mercado atual.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-md mt-md w-full sm:w-auto">
-                    <a class="bg-primary text-on-primary font-semibold px-xl py-md rounded-lg text-center hover:bg-primary-fixed transition-all shadow-[0_0_20px_rgba(123,255,149,0.2)] active:scale-95 transform flex items-center justify-center gap-sm" href="#">
+                    <a class="bg-primary text-on-primary font-semibold px-xl py-md rounded-lg text-center hover:bg-primary-fixed transition-all shadow-[0_0_20px_rgba(123,255,149,0.2)] active:scale-95 transform flex items-center justify-center gap-sm" href="#formations">
                         Descobrir minha formação
                         <span class="material-symbols-outlined font-normal">arrow_forward</span>
                     </a>
@@ -256,33 +256,59 @@
     </section>
 
     <!-- Métricas e Prova Social -->
-    <section class="w-full border-t border-b border-border-subtle bg-surface-med py-xl relative z-10">
+    <section id="metricas" class="metrics-section w-full border-t border-b border-border-subtle bg-surface-med py-xl relative z-10">
         <div class="max-w-container-max mx-auto px-gutter">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-lg divide-x-0 md:divide-x md:divide-border-subtle text-center">
-                <div class="flex flex-col gap-xs p-md">
-                    <h3 class="text-3xl md:text-4xl font-extrabold text-primary">+15.000</h3>
+                <div class="metric-item flex flex-col gap-xs p-md">
+                    <h3 class="metric-number text-3xl md:text-4xl font-extrabold text-primary" data-count-target="15000" data-count-prefix="+" data-count-separator=".">+0</h3>
                     <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Alunos formados</p>
                 </div>
-                <div class="flex flex-col gap-xs p-md">
-                    <h3 class="text-3xl md:text-4xl font-extrabold text-primary">92%</h3>
+                <div class="metric-item flex flex-col gap-xs p-md">
+                    <h3 class="metric-number text-3xl md:text-4xl font-extrabold text-primary" data-count-target="92" data-count-suffix="%">0%</h3>
                     <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Taxa de empregabilidade</p>
                 </div>
-                <div class="flex flex-col gap-xs p-md">
-                    <h3 class="text-3xl md:text-4xl font-extrabold text-primary">400+</h3>
+                <div class="metric-item flex flex-col gap-xs p-md">
+                    <h3 class="metric-number text-3xl md:text-4xl font-extrabold text-primary" data-count-target="400" data-count-suffix="+">0+</h3>
                     <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Horas de conteúdo prático</p>
                 </div>
-                <div class="flex flex-col gap-xs p-md">
-                    <h3 class="text-3xl md:text-4xl font-extrabold text-primary">4.9/5</h3>
+                <div class="metric-item flex flex-col gap-xs p-md">
+                    <h3 class="metric-number text-3xl md:text-4xl font-extrabold text-primary" data-count-target="4.9" data-count-suffix="/5" data-count-decimals="1">0/5</h3>
                     <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Avaliação média</p>
                 </div>
             </div>
-            <!-- Subdued Company Logos -->
-            <div class="mt-lg pt-lg border-t border-border-subtle flex flex-wrap justify-center items-center gap-xl opacity-30 grayscale hover:opacity-60 transition-opacity duration-300">
-                <span class="text-lg font-extrabold text-text-muted tracking-widest">METAPRO</span>
-                <span class="text-lg font-extrabold text-text-muted tracking-widest">TECHCORP</span>
-                <span class="text-lg font-extrabold text-text-muted tracking-widest">LOGICWORKS</span>
-                <span class="text-lg font-extrabold text-text-muted tracking-widest">OUTERLABS</span>
-                <span class="text-lg font-extrabold text-text-muted tracking-widest">CODECORE</span>
+
+            <!-- Marquee infinito de empresas -->
+            <div class="metrics-marquee-wrapper">
+                <p class="metrics-marquee-label">Nossos alunos trabalham em empresas como</p>
+                <div class="metrics-marquee" aria-label="Empresas onde nossos alunos trabalham">
+                    <div class="metrics-marquee__track">
+                        <span class="metrics-marquee__logo">Google</span>
+                        <span class="metrics-marquee__logo">Microsoft</span>
+                        <span class="metrics-marquee__logo">iFood</span>
+                        <span class="metrics-marquee__logo">Nubank</span>
+                        <span class="metrics-marquee__logo">Amazon</span>
+                        <span class="metrics-marquee__logo">Mercado Livre</span>
+                        <span class="metrics-marquee__logo">Stone</span>
+                        <span class="metrics-marquee__logo">PicPay</span>
+                        <span class="metrics-marquee__logo">C6 Bank</span>
+                        <span class="metrics-marquee__logo">Globo</span>
+                        <span class="metrics-marquee__logo">VTEX</span>
+                        <span class="metrics-marquee__logo">XP Inc</span>
+                        <!-- Duplicação para loop visual contínuo -->
+                        <span class="metrics-marquee__logo" aria-hidden="true">Google</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">Microsoft</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">iFood</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">Nubank</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">Amazon</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">Mercado Livre</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">Stone</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">PicPay</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">C6 Bank</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">Globo</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">VTEX</span>
+                        <span class="metrics-marquee__logo" aria-hidden="true">XP Inc</span>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -635,7 +661,6 @@
                     <span class="testimonials-eyebrow">Histórias de evolução</span>
                     <h2 id="testimonials-title">Quando existe um caminho, aprender deixa de parecer impossível.</h2>
                     <p>Relatos que ilustram como clareza, prática e constância podem transformar a experiência de quem estuda programação.</p>
-                    <div class="testimonials-disclaimer"><span class="material-symbols-outlined" aria-hidden="true">info</span><div><strong>Conteúdo demonstrativo</strong><small>Depoimentos fictícios para composição visual. Substitua por relatos reais antes de publicar.</small></div></div>
                     <div class="testimonials-index" aria-hidden="true"><span>01</span><i></i><span>04</span></div>
                 </header>
                 <div class="testimonials-list">
@@ -693,6 +718,6 @@
     <script src="https://unpkg.com/lenis@1.3.23/dist/lenis.min.js"></script>
     <script src="js/site-experience.js?v=3"></script>
     <!-- Script de Animações GSAP -->
-    <script src="js/animations.js?v=16"></script>
+    <script src="js/animations.js?v=17"></script>
 </body>
 </html>
