@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>DevClub - Seu sistema de evolução em tecnologia</title>
+    
+    <!-- Material Symbols para ícones modernos -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Configuração do Tailwind com base no Design System 'DevClub Lumina' -->
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed-variant": "#005320",
+              "secondary-fixed-dim": "#d6baff",
+              "accent-bright": "#42F481",
+              "on-surface": "#e3e2e5",
+              "on-error-container": "#ffdad6",
+              "inverse-surface": "#e3e2e5",
+              "surface": "#121315",
+              "border-subtle": "#262A31",
+              "on-primary": "#003914",
+              "surface-low": "#0E1013",
+              "outline": "#859583",
+              "surface-container": "#1f2022",
+              "surface-tint": "#1de469",
+              "surface-dim": "#121315",
+              "on-secondary-container": "#dbc3ff",
+              "surface-high": "#1A1D22",
+              "inverse-on-surface": "#303033",
+              "surface-bright": "#38393b",
+              "text-muted": "#707572",
+              "secondary-container": "#7403e7",
+              "error": "#ffb4ab",
+              "on-primary-fixed": "#002109",
+              "tertiary-container": "#ffba85",
+              "surface-med": "#13151A",
+              "on-secondary-fixed-variant": "#5f00bf",
+              "primary-container": "#22e66b",
+              "on-tertiary-fixed-variant": "#6a3b11",
+              "on-tertiary-fixed": "#2f1500",
+              "on-primary-container": "#006228",
+              "outline-variant": "#3c4a3c",
+              "on-surface-variant": "#bacbb8",
+              "tertiary": "#ffdfc9",
+              "on-tertiary-container": "#79481d",
+              "background": "#121315",
+              "tertiary-fixed-dim": "#fdb883",
+              "primary-fixed-dim": "#1de469",
+              "text-secondary": "#A6ACA9",
+              "on-secondary": "#430089",
+              "on-error": "#690005",
+              "text-primary": "#F5F7F6",
+              "primary": "#7bff95",
+              "primary-fixed": "#67ff8c",
+              "surface-variant": "#343537",
+              "tertiary-fixed": "#ffdcc4",
+              "secondary-fixed": "#ecdcff",
+              "inverse-primary": "#006e2d",
+              "surface-container-high": "#292a2c",
+              "secondary": "#d6baff",
+              "on-tertiary": "#4e2600",
+              "error-container": "#93000a",
+              "surface-container-low": "#1b1c1e",
+              "on-secondary-fixed": "#280057",
+              "surface-container-lowest": "#0d0e10",
+              "surface-container-highest": "#343537",
+              "on-background": "#e3e2e5"
+            },
+            borderRadius: {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "full": "9999px"
+            },
+            spacing: {
+              "xs": "4px",
+              "xl": "32px",
+              "xxl": "48px",
+              "base-unit": "8px",
+              "gutter": "24px",
+              "margin-mobile": "16px",
+              "sm": "8px",
+              "container-max": "1280px",
+              "lg": "24px",
+              "md": "16px"
+            }
+          }
+        }
+      }
+    </script>
+
+    <!-- Estilos Adicionais Isolados -->
+    <link href="css/custom.css?v=11" rel="stylesheet">
+
+    <!-- GSAP & ScrollTrigger CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+</head>
+<body class="intro-active antialiased overflow-x-hidden font-sans bg-background text-on-background selection:bg-primary/30 selection:text-primary">
+    <!-- Intro inspirada no efeito de texto mascarado, sem uso de video -->
+    <div class="entry-intro" data-entry-intro aria-hidden="true">
+        <div class="entry-intro__wash"></div>
+        <div class="entry-intro__content">
+            <p class="entry-intro__eyebrow">A EXPERIÊNCIA COMEÇA AGORA</p>
+            <div class="entry-intro__word" data-entry-word>DEVCLUB</div>
+            <div class="entry-intro__line" aria-hidden="true"></div>
+        </div>
+    </div>
+    <noscript><style>body.intro-active{overflow:auto}.entry-intro{display:none}</style></noscript>
+    <!-- Navegação de Topo (Estilo Supaste - Notch com Cantos Côncavos) -->
+    <nav class="fixed top-0 left-0 right-0 z-50 flex justify-center bg-transparent pointer-events-none">
+        <div class="pointer-events-auto relative w-[90%] max-w-[1200px] bg-[#08090B] px-xl py-md rounded-b-2xl border-b border-l border-r border-border-subtle flex justify-between items-center nav-pill-supaste shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+            <!-- Marca/Logo -->
+            <div class="flex items-center">
+                <span class="text-2xl font-bold tracking-tight text-primary">DevClub</span>
+            </div>
+            
+            <!-- Links (Apenas Desktop) -->
+            <div class="hidden md:flex items-center gap-md lg:gap-lg">
+                <a class="text-text-secondary hover:text-text-primary px-sm py-xs rounded hover:bg-surface-high/50 transition-all duration-200 active:scale-95 transform whitespace-nowrap" href="#inicio">Inicio</a>
+                <a class="text-text-secondary hover:text-text-primary px-sm py-xs rounded hover:bg-surface-high/50 transition-all duration-200 active:scale-95 transform whitespace-nowrap" href="#formations">Formações</a>
+                <a class="text-text-secondary hover:text-text-primary px-sm py-xs rounded hover:bg-surface-high/50 transition-all duration-200 active:scale-95 transform whitespace-nowrap" target="_blank" href="https://lp.devclub.com.br/mba/">MBA</a>
+                <a class="text-text-secondary hover:text-text-primary px-sm py-xs rounded hover:bg-surface-high/50 transition-all duration-200 active:scale-95 transform whitespace-nowrap" href="#como-funciona">Como funciona</a>
+                <a class="text-text-secondary hover:text-text-primary px-sm py-xs rounded hover:bg-surface-high/50 transition-all duration-200 active:scale-95 transform whitespace-nowrap" href="#sobre">Sobre</a>
+                <a class="text-text-secondary hover:text-text-primary px-sm py-xs rounded hover:bg-surface-high/50 transition-all duration-200 active:scale-95 transform whitespace-nowrap" href="#depoimentos">Nossos Alunos</a>
+            </div>
+            
+            <!-- Ações -->
+            <div class="flex items-center gap-md ml-lg lg:ml-xl">
+                <a class="hidden md:block text-text-secondary hover:text-text-primary text-sm font-semibold transition-colors active:scale-95 transform whitespace-nowrap" href="#">Entrar</a>
+                <a class="bg-primary text-on-primary text-sm font-semibold px-md py-sm rounded-lg hover:bg-primary-fixed transition-colors active:scale-95 transform shadow-[0_0_15px_rgba(123,255,149,0.3)] whitespace-nowrap" href="#">Conhecer formações</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section com WebGL Shader e Mockup da Plataforma -->
+    <section id="inicio" class="relative min-h-[880px] w-full flex items-center pt-32 pb-xxl overflow-hidden">
+        <!-- Shader de fundo WebGL -->
+        <div class="absolute inset-0 w-full h-full z-0 opacity-55 mix-blend-screen">
+            <canvas id="shader-canvas-ANIMATION_1" class="block w-full h-full"></canvas>
+        </div>
+
+        <div class="max-w-container-max mx-auto px-gutter w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-xxl items-center mt-xl">
+            <!-- Chamada Principal (Esquerda) -->
+            <div class="flex flex-col items-start gap-lg max-w-xl">
+                <h1 class="text-4xl md:text-5xl font-extrabold leading-tight text-text-primary">
+                    Sua carreira em tecnologia começa com um <span class="text-primary relative inline-block">caminho claro.
+                        <svg class="absolute w-full h-3 -bottom-1 left-0 text-primary/30" preserveAspectRatio="none" viewBox="0 0 100 10">
+                            <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" stroke-width="4"></path>
+                        </svg>
+                    </span>
+                </h1>
+                <p class="text-lg md:text-xl text-text-secondary">
+                    O DevClub não é apenas mais um curso. É um sistema completo de evolução desenhado para transformar você em um desenvolvedor profissional, focado na realidade e exigências do mercado atual.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-md mt-md w-full sm:w-auto">
+                    <a class="bg-primary text-on-primary font-semibold px-xl py-md rounded-lg text-center hover:bg-primary-fixed transition-all shadow-[0_0_20px_rgba(123,255,149,0.2)] active:scale-95 transform flex items-center justify-center gap-sm" href="#">
+                        Descobrir minha formação
+                        <span class="material-symbols-outlined font-normal">arrow_forward</span>
+                    </a>
+                    <a class="border border-border-subtle bg-surface-low text-text-primary font-semibold px-xl py-md rounded-lg text-center hover:bg-surface-high transition-all active:scale-95 transform flex items-center justify-center gap-sm" href="#">
+                        Conhecer o método
+                        <span class="material-symbols-outlined font-normal">play_circle</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mockup Interativo da Plataforma (Direita) -->
+            <div class="relative hidden lg:block w-full h-[600px]">
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[450px] bg-surface-low border border-border-subtle rounded-xl shadow-2xl overflow-hidden glass-panel ambient-glow z-10 transition-transform duration-500 hover:scale-[1.02]">
+                    <!-- Browser Header -->
+                    <div class="w-full h-10 bg-surface-high border-b border-border-subtle flex items-center px-md gap-sm">
+                        <div class="w-3 h-3 rounded-full bg-red-500/60"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500/60"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500/60"></div>
+                        <div class="ml-auto bg-surface-low px-md py-xs rounded text-text-muted font-mono text-[10px]">app.devclub.com.br</div>
+                    </div>
+                    <!-- Mockup Content -->
+                    <div class="p-lg flex flex-col gap-md">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="text-xl font-bold text-text-primary">Trilha Full Stack</h3>
+                                <p class="text-text-muted text-sm">Módulo 4: Construindo APIs com Node.js</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full border-2 border-primary flex items-center justify-center text-primary font-bold text-sm">
+                                68%
+                            </div>
+                        </div>
+                        <!-- Progress Bar -->
+                        <div class="w-full h-2 bg-surface-high rounded-full overflow-hidden">
+                            <div class="h-full bg-primary w-[68%] relative">
+                                <div class="absolute right-0 top-0 bottom-0 w-4 bg-white/20 blur-sm"></div>
+                            </div>
+                        </div>
+                        <!-- Lesson List -->
+                        <div class="flex flex-col gap-sm mt-md">
+                            <div class="flex items-center gap-md p-md bg-surface-high rounded-lg border border-border-subtle">
+                                <span class="material-symbols-outlined text-primary fill-1">check_circle</span>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-text-primary">Fundamentos de APIs RESTful</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-md p-md bg-surface-high rounded-lg border border-primary/30 shadow-[0_0_10px_rgba(66,244,129,0.1)]">
+                                <span class="material-symbols-outlined text-primary fill-1 animate-pulse">play_circle</span>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-text-primary">Criando rotas e controllers</p>
+                                </div>
+                                <span class="text-xs text-primary font-mono font-medium">Em andamento</span>
+                            </div>
+                            <div class="flex items-center gap-md p-md bg-surface-med rounded-lg border border-border-subtle opacity-50">
+                                <span class="material-symbols-outlined text-text-muted">lock</span>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-text-muted">Integração com Banco de Dados</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating Card 1: Projeto Aprovado -->
+                <div class="absolute right-[450px] top-[40px] w-48 bg-surface-low border border-border-subtle rounded-lg p-md shadow-xl glass-panel z-20 animate-[bounce_4s_infinite_alternate]">
+                    <div class="flex items-center gap-sm">
+                        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-sm fill-1">verified</span>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-text-primary">Projeto Aprovado</p>
+                            <p class="text-[10px] text-text-muted">Frontend Masters</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating Card 2: Mentoria Amanhã -->
+                <div class="absolute right-[20px] bottom-[80px] w-56 bg-surface-low border border-border-subtle rounded-lg p-md shadow-xl glass-panel z-20 animate-[bounce_5s_infinite_alternate-reverse]">
+                    <div class="flex items-center gap-sm">
+                        <div class="w-8 h-8 rounded-full bg-secondary-container/20 flex items-center justify-center border border-secondary-container/30">
+                            <span class="material-symbols-outlined text-secondary-container text-sm">calendar_today</span>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-text-primary">Mentoria Amanhã</p>
+                            <p class="text-[10px] text-text-muted">Revisão de Código - 19h</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Métricas e Prova Social -->
+    <section class="w-full border-t border-b border-border-subtle bg-surface-med py-xl relative z-10">
+        <div class="max-w-container-max mx-auto px-gutter">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-lg divide-x-0 md:divide-x md:divide-border-subtle text-center">
+                <div class="flex flex-col gap-xs p-md">
+                    <h3 class="text-3xl md:text-4xl font-extrabold text-primary">+15.000</h3>
+                    <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Alunos formados</p>
+                </div>
+                <div class="flex flex-col gap-xs p-md">
+                    <h3 class="text-3xl md:text-4xl font-extrabold text-primary">92%</h3>
+                    <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Taxa de empregabilidade</p>
+                </div>
+                <div class="flex flex-col gap-xs p-md">
+                    <h3 class="text-3xl md:text-4xl font-extrabold text-primary">400+</h3>
+                    <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Horas de conteúdo prático</p>
+                </div>
+                <div class="flex flex-col gap-xs p-md">
+                    <h3 class="text-3xl md:text-4xl font-extrabold text-primary">4.9/5</h3>
+                    <p class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Avaliação média</p>
+                </div>
+            </div>
+            <!-- Subdued Company Logos -->
+            <div class="mt-lg pt-lg border-t border-border-subtle flex flex-wrap justify-center items-center gap-xl opacity-30 grayscale hover:opacity-60 transition-opacity duration-300">
+                <span class="text-lg font-extrabold text-text-muted tracking-widest">METAPRO</span>
+                <span class="text-lg font-extrabold text-text-muted tracking-widest">TECHCORP</span>
+                <span class="text-lg font-extrabold text-text-muted tracking-widest">LOGICWORKS</span>
+                <span class="text-lg font-extrabold text-text-muted tracking-widest">OUTERLABS</span>
+                <span class="text-lg font-extrabold text-text-muted tracking-widest">CODECORE</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Formações (GSAP Sticky Split-Screen Showcase) -->
+    <section id="formations" class="relative w-full bg-background border-b border-border-subtle py-xxl">
+        <div class="max-w-container-max mx-auto px-gutter relative z-10">
+            <!-- Cabeçalho da Seção -->
+            <div class="text-center mb-xxl max-w-2xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-text-primary mb-md">Nossas Formações</h2>
+                <p class="text-lg text-text-secondary">Especialize-se com trilhas focadas, práticas e desenhadas para as reais demandas das melhores empresas de tecnologia do mercado.</p>
+            </div>
+
+            <!-- Split Layout Container -->
+            <div class="split-layout-container flex flex-col lg:flex-row gap-xl lg:gap-0">
+                
+                <!-- Coluna da Esquerda: Textos das Formações (Rola no Desktop) -->
+                <div class="text-column w-full lg:w-1/2 flex flex-col gap-12 lg:gap-0">
+                    
+                    <!-- Formação 1: Fullstack -->
+                    <div class="formation-text-block min-h-0 lg:min-h-screen flex flex-col justify-center py-lg lg:py-0 pr-0 lg:pr-xl">
+                        <div class="lg:hidden block formation-image-wrapper mb-lg">
+                            <img src="assets/fullstack.jpeg" alt="Formação Fullstack" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-xs font-mono font-bold text-primary uppercase tracking-wider mb-sm">FORMAÇÃO CORE</span>
+                        <h3 class="text-2xl md:text-3xl font-extrabold text-text-primary mb-md">Desenvolvedor Fullstack Premium</h3>
+                        <p class="text-base text-text-secondary leading-relaxed mb-md">
+                            Aprenda a construir aplicações ponta a ponta. Domine HTML5, CSS3, JavaScript moderno, React para interfaces ultra-rápidas e Node.js para APIs corporativas de alta performance. O pilar fundamental para qualquer programador profissional.
+                        </p>
+                        <ul class="flex flex-col gap-sm text-sm text-text-muted mb-lg">
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> React.js, Tailwind CSS e UI/UX</li>
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Node.js, Express, Postgres e MongoDB</li>
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Arquitetura e Deploy na AWS/Vercel</li>
+                        </ul>
+                        <div>
+                            <a href="#" class="inline-flex items-center gap-xs text-sm font-bold text-primary hover:text-primary-fixed transition-colors">
+                                Detalhes da Formação <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Formação 2: Frontend -->
+                    <div class="formation-text-block min-h-0 lg:min-h-screen flex flex-col justify-center py-lg lg:py-0 pr-0 lg:pr-xl">
+                        <div class="lg:hidden block formation-image-wrapper mb-lg">
+                            <img src="assets/frontend.jpeg" alt="Formação Frontend" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-xs font-mono font-bold text-primary uppercase tracking-wider mb-sm">UI/UX & PERFORMANCE</span>
+                        <h3 class="text-2xl md:text-3xl font-extrabold text-text-primary mb-md">Frontend Master Specialist</h3>
+                        <p class="text-base text-text-secondary leading-relaxed mb-md">
+                            Diferencie-se criando interfaces que encantam. Domine animações com GSAP, controle de estado avançado, frameworks SPA como Next.js, metodologias de design system corporativo, e técnicas avançadas de otimização de performance para Web.
+                        </p>
+                        <ul class="flex flex-col gap-sm text-sm text-text-muted mb-lg">
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Next.js 14, SSR, SSG e App Router</li>
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> GSAP, ScrollTrigger, Framer Motion</li>
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Core Web Vitals e Web Performance</li>
+                        </ul>
+                        <div>
+                            <a href="#" class="inline-flex items-center gap-xs text-sm font-bold text-primary hover:text-primary-fixed transition-colors">
+                                Detalhes da Formação <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Formação 3: Backend -->
+                    <div class="formation-text-block min-h-0 lg:min-h-screen flex flex-col justify-center py-lg lg:py-0 pr-0 lg:pr-xl">
+                        <div class="lg:hidden block formation-image-wrapper mb-lg">
+                            <img src="assets/backedn.jpeg" alt="Formação Backend" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-xs font-mono font-bold text-primary uppercase tracking-wider mb-sm">ESCALA & SEGURANÇA</span>
+                        <h3 class="text-2xl md:text-3xl font-extrabold text-text-primary mb-md">Backend Software Engineer</h3>
+                        <p class="text-base text-text-secondary leading-relaxed mb-md">
+                            Seja o arquiteto por trás dos grandes sistemas. Aprenda sobre filas de mensageria com Redis e RabbitMQ, testes automatizados integrados, arquitetura Limpa (Clean Architecture), Docker, Kubernetes e monitoramento com Prometheus e Grafana.
+                        </p>
+                        <ul class="flex flex-col gap-sm text-sm text-text-muted mb-lg">
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> APIs Restful, GraphQL e gRPC</li>
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Microserviços, Docker, Docker Compose</li>
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Redis Caching e RabbitMQ/Kafka</li>
+                        </ul>
+                        <div>
+                            <a href="#" class="inline-flex items-center gap-xs text-sm font-bold text-primary hover:text-primary-fixed transition-colors">
+                                Detalhes da Formação <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Formação 4: Inteligência Artificial -->
+                    <div class="formation-text-block min-h-0 lg:min-h-screen flex flex-col justify-center py-lg lg:py-0 pr-0 lg:pr-xl">
+                        <div class="lg:hidden block formation-image-wrapper mb-lg">
+                            <img src="assets/ia%20e%20automacao.jpeg" alt="IA e Automação" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-xs font-mono font-bold text-primary uppercase tracking-wider mb-sm">FUTURO & EFICIÊNCIA</span>
+                        <h3 class="text-2xl md:text-3xl font-extrabold text-text-primary mb-md">Especialista em IA e Automação</h3>
+                        <p class="text-base text-text-secondary leading-relaxed mb-md">
+                            Multiplique a sua produtividade e escale processos de negócios. Aprenda a integrar os principais LLMs (GPT, Gemini, Claude) em seus produtos de software. Crie bots de automação autônomos, agentes de IA e fluxos inteligentes com LangChain e n8n.
+                        </p>
+                        <ul class="flex flex-col gap-sm text-sm text-text-muted mb-lg">
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> APIs da OpenAI, Google Gemini e Claude</li>
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Desenvolvimento de Agentes de IA com LangChain</li>
+                            <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Integração de fluxos automáticos com n8n</li>
+                        </ul>
+                        <div>
+                            <a href="#" class="inline-flex items-center gap-xs text-sm font-bold text-primary hover:text-primary-fixed transition-colors">
+                                Detalhes da Formação <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Coluna da Direita: Imagens das Formações (Fica Sticky no Desktop) -->
+                <div class="sticky-images-column hidden lg:block w-full lg:w-1/2">
+                    <div class="formation-image-wrapper">
+                        <!-- Imagem 1: Fullstack (Inicia ativa por padrão) -->
+                        <img src="assets/fullstack.jpeg" alt="Formação Fullstack" class="formation-image-item active">
+                        <!-- Imagem 2: Frontend -->
+                        <img src="assets/frontend.jpeg" alt="Formação Frontend" class="formation-image-item">
+                        <!-- Imagem 3: Backend -->
+                        <img src="assets/backedn.jpeg" alt="Formação Backend" class="formation-image-item">
+                        <!-- Imagem 4: IA e Automações -->
+                        <img src="assets/ia%20e%20automacao.jpeg" alt="IA e Automação" class="formation-image-item">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- DevPath Journey (Método DevPath) -->
+    <section id="como-funciona" class="py-xxl w-full bg-background relative overflow-hidden">
+        <div class="max-w-container-max mx-auto px-gutter relative z-10">
+            <div class="text-center mb-xxl max-w-2xl mx-auto font-sans">
+                <h2 class="text-3xl font-extrabold text-text-primary mb-md">O Método DevPath</h2>
+                <p class="text-lg text-text-secondary">Uma jornada estruturada, onde cada passo constrói a base para o próximo, eliminando a confusão de estudar sozinho.</p>
+            </div>
+            
+            <div class="relative max-w-4xl mx-auto">
+                <!-- Timeline Vertical Indicator Line -->
+                <div class="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 bg-surface-high md:-translate-x-1/2 rounded-full z-0">
+                    <div class="h-[60%] w-full bg-primary shadow-[0_0_15px_rgba(66,244,129,0.5)] rounded-full"></div>
+                </div>
+
+                <!-- Timeline Steps -->
+                <div class="space-y-xl relative z-10">
+                    
+                    <!-- Step 1: Fundamentos -->
+                    <div class="flex flex-col md:flex-row items-start md:items-center w-full gap-lg">
+                        <div class="md:w-1/2 flex justify-end pl-16 md:pl-0 md:pr-lg text-left md:text-right">
+                            <div class="bg-surface-low border border-border-subtle p-lg rounded-xl glow-hover w-full md:max-w-sm">
+                                <h4 class="text-lg font-bold text-text-primary mb-sm">1. Fundamentos Sólidos</h4>
+                                <p class="text-sm text-text-secondary leading-relaxed">Construção de base sólida em lógica e algoritmos antes de pular para frameworks do momento.</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-4 md:left-1/2 w-8 h-8 rounded-full bg-background border-4 border-primary shadow-[0_0_10px_rgba(66,244,129,0.5)] transform md:-translate-x-1/2 flex items-center justify-center mt-6 md:mt-0 z-20">
+                            <div class="w-2 h-2 bg-primary rounded-full"></div>
+                        </div>
+                        <div class="hidden md:block md:w-1/2"></div>
+                    </div>
+
+                    <!-- Step 2: Projetos Reais -->
+                    <div class="flex flex-col md:flex-row items-start md:items-center w-full gap-lg">
+                        <div class="hidden md:block md:w-1/2"></div>
+                        <div class="absolute left-4 md:left-1/2 w-8 h-8 rounded-full bg-background border-4 border-primary shadow-[0_0_10px_rgba(66,244,129,0.5)] transform md:-translate-x-1/2 flex items-center justify-center mt-6 md:mt-0 z-20">
+                            <div class="w-2 h-2 bg-primary rounded-full"></div>
+                        </div>
+                        <div class="w-full md:w-1/2 pl-16 md:pl-lg">
+                            <div class="bg-surface-low border border-border-subtle p-lg rounded-xl glow-hover w-full md:max-w-sm">
+                                <h4 class="text-lg font-bold text-text-primary mb-sm">2. Projetos Reais</h4>
+                                <p class="text-sm text-text-secondary leading-relaxed">Aplicação prática imediata com escopo técnico idêntico ao que você encontrará nas empresas reais.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Feedback Contínuo (Active state) -->
+                    <div class="flex flex-col md:flex-row items-start md:items-center w-full gap-lg">
+                        <div class="md:w-1/2 flex justify-end pl-16 md:pl-0 md:pr-lg text-left md:text-right">
+                            <div class="bg-surface-low border border-primary/30 p-lg rounded-xl glow-hover w-full md:max-w-sm shadow-[0_0_15px_rgba(66,244,129,0.1)]">
+                                <div class="text-[10px] font-mono font-bold text-primary mb-xs uppercase tracking-wider">Você está aqui</div>
+                                <h4 class="text-lg font-bold text-text-primary mb-sm">3. Feedback de Especialistas</h4>
+                                <p class="text-sm text-text-secondary leading-relaxed">Code reviews de desenvolvedores seniores para corrigir vícios e elevar a qualidade da sua escrita.</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-3 md:left-1/2 w-10 h-10 rounded-full bg-primary border-4 border-background shadow-[0_0_20px_rgba(66,244,129,0.8)] transform md:-translate-x-1/2 flex items-center justify-center mt-5 md:mt-0 z-20">
+                            <span class="material-symbols-outlined text-background text-lg font-normal fill-1">star</span>
+                        </div>
+                        <div class="hidden md:block md:w-1/2"></div>
+                    </div>
+
+                    <!-- Step 4: Oportunidades -->
+                    <div class="flex flex-col md:flex-row items-start md:items-center w-full gap-lg opacity-50 transition-opacity duration-300 hover:opacity-100">
+                        <div class="hidden md:block md:w-1/2"></div>
+                        <div class="absolute left-4 md:left-1/2 w-8 h-8 rounded-full bg-background border-4 border-border-subtle transform md:-translate-x-1/2 flex items-center justify-center mt-6 md:mt-0 z-20"></div>
+                        <div class="w-full md:w-1/2 pl-16 md:pl-lg">
+                            <div class="bg-surface-low border border-border-subtle p-lg rounded-xl w-full md:max-w-sm">
+                                <h4 class="text-lg font-bold text-text-primary mb-sm">4. Direcionamento e Contatos</h4>
+                                <p class="text-sm text-text-secondary leading-relaxed">Preparação estruturada para entrevistas técnicas, consultoria de perfil e conexões diretas no mercado.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre o fundador: história, origem e metodologia -->
+    <section id="sobre" class="about-premium" aria-labelledby="about-title">
+        <div class="about-orb about-orb--green" aria-hidden="true"></div>
+        <div class="about-orb about-orb--purple" aria-hidden="true"></div>
+
+        <div class="about-container">
+            <header class="about-intro">
+                <div class="about-intro__copy">
+                    <span class="about-badge about-reveal"><span class="about-badge__dot" aria-hidden="true"></span>Sobre o fundador</span>
+                    <h2 id="about-title" class="about-title about-reveal">Uma trajetória que se transformou em um <span>método de ensino.</span></h2>
+                    <p class="about-lead about-reveal">Rodolfo Mori é programador, mentor e fundador do DevClub. Sua experiência aprendendo, praticando e enfrentando os desafios do mercado ajudou a construir uma metodologia voltada para quem precisa de direção, prática e clareza para evoluir.</p>
+                    <div class="about-principle about-reveal"><span class="material-symbols-outlined" aria-hidden="true">route</span><p>Da transformação pessoal a um método capaz de transformar outras carreiras.</p></div>
+                </div>
+
+                <figure class="founder-figure about-reveal">
+                    <div class="founder-frame">
+                        <img class="founder-photo" src="assets/rodolfo.jpg" alt="Rodolfo Mori, fundador do DevClub">
+                        <div class="founder-frame__grid" aria-hidden="true"></div>
+                        <span class="founder-index" aria-hidden="true">01 / FOUNDER</span>
+                    </div>
+                    <figcaption class="founder-caption"><span>Rodolfo Mori</span><span>Fundador do DevClub</span></figcaption>
+                    <div class="founder-tags" aria-label="Atuação de Rodolfo Mori"><span class="founder-tag">Programador e mentor</span><span class="founder-tag">Ensino orientado à prática</span></div>
+                </figure>
+            </header>
+
+            <div class="about-editorial-grid">
+                <div class="origin-panel">
+                    <div class="about-section-heading about-reveal">
+                        <span class="about-kicker">A origem do DevClub</span>
+                        <h3>Experiência transformada em direção.</h3>
+                        <p>A jornada conecta os aprendizados de Rodolfo ao caminho estruturado que o aluno encontra no DevClub.</p>
+                    </div>
+                    <div class="devpath" aria-label="Linha do tempo sobre a origem do DevClub">
+                        <div class="devpath__rail" aria-hidden="true"><div class="devpath__progress"></div></div>
+                        <article class="timeline-item is-current">
+                            <div class="timeline-item__marker" aria-hidden="true"><span class="material-symbols-outlined">code</span></div>
+                            <div><span class="timeline-item__step">Etapa 01 · O início</span><h4>O primeiro contato com a programação</h4><p class="timeline-item__placeholder">[Adicionar o início real da trajetória de Rodolfo]</p></div>
+                        </article>
+                        <article class="timeline-item">
+                            <div class="timeline-item__marker" aria-hidden="true"><span class="material-symbols-outlined">conversion_path</span></div>
+                            <div><span class="timeline-item__step">Etapa 02 · Os desafios</span><h4>Aprender sem um caminho claro</h4><p>Conteúdos desconectados e pouca direção tornam o aprendizado mais confuso. O método nasce para organizar essa jornada.</p></div>
+                        </article>
+                        <article class="timeline-item">
+                            <div class="timeline-item__marker" aria-hidden="true"><span class="material-symbols-outlined">build</span></div>
+                            <div><span class="timeline-item__step">Etapa 03 · A descoberta</span><h4>Aprender construindo</h4><p>Prática, projetos e resolução de problemas se tornam elementos centrais para transformar teoria em habilidade.</p></div>
+                        </article>
+                        <article class="timeline-item">
+                            <div class="timeline-item__marker" aria-hidden="true"><span class="material-symbols-outlined">hub</span></div>
+                            <div><span class="timeline-item__step">Etapa 04 · O DevClub</span><h4>Transformar experiência em método</h4><p>Uma sequência estruturada para ajudar outras pessoas a evoluírem com mais clareza, prática e segurança na tecnologia.</p></div>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="method-panel">
+                    <div class="about-section-heading about-reveal">
+                        <span class="about-kicker">Metodologia de ensino</span>
+                        <h3>Aprendizado que se transforma em evolução profissional.</h3>
+                        <p>Cada etapa foi pensada para reduzir a confusão, aumentar a prática e desenvolver habilidades que possam ser demonstradas em projetos reais.</p>
+                    </div>
+                    <div class="method-bento">
+                        <article class="method-card method-card--clarity about-card-reveal">
+                            <div class="method-card__top"><span class="icon-container"><span class="material-symbols-outlined">explore</span></span><span class="method-card__number">01</span></div>
+                            <h4>Clareza antes da velocidade</h4><p>Uma sequência lógica que começa pelos fundamentos e avança sem pular etapas importantes.</p>
+                            <div class="mini-roadmap" aria-hidden="true"><span class="is-complete"></span><span class="is-complete"></span><span></span><span></span></div>
+                        </article>
+                        <article class="method-card method-card--practice about-card-reveal">
+                            <div class="method-card__top"><span class="icon-container"><span class="material-symbols-outlined">terminal</span></span><span class="method-card__number">02 · Core</span></div>
+                            <h4>Aprender fazendo</h4><p>Exercícios e projetos transformam conteúdo em experiência prática.</p>
+                            <div class="practice-window" aria-label="Exemplo visual de atividade prática">
+                                <div class="practice-window__bar"><span></span><span></span><span></span><small>projeto-devclub.js</small></div>
+                                <div class="practice-window__body"><code><i>const</i> progresso = <b>"prática"</b>;</code><code><i>return</i> construir(progresso);</code></div>
+                                <div class="practice-window__status"><span><span class="material-symbols-outlined">task_alt</span>Tarefa concluída</span><strong>Feedback recebido</strong></div>
+                            </div>
+                        </article>
+                        <article class="method-card method-card--accessible about-card-reveal">
+                            <div class="method-card__top"><span class="icon-container icon-container--purple"><span class="material-symbols-outlined">lightbulb</span></span><span class="method-card__number">03</span></div>
+                            <h4>Explicações acessíveis</h4><p>Conceitos técnicos apresentados de forma direta, objetiva e compreensível.</p>
+                            <div class="clarity-diagram" aria-hidden="true"><span>Complexo</span><i class="material-symbols-outlined">arrow_forward</i><strong>Claro</strong></div>
+                        </article>
+                        <article class="method-card method-card--market about-card-reveal">
+                            <div class="method-card__top"><span class="icon-container"><span class="material-symbols-outlined">track_changes</span></span><span class="method-card__number">04</span></div>
+                            <div><h4>Evolução orientada ao mercado</h4><p>Habilidades, projetos e comportamentos conectados à trajetória profissional.</p></div>
+                            <div class="market-signal" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-block">
+                <div class="process-heading about-reveal"><span class="about-kicker">O fluxo do método</span><h3>Um ciclo claro de evolução.</h3></div>
+                <div class="process-flow" aria-label="Fluxo da metodologia DevClub">
+                    <div class="process-line" aria-hidden="true"><span></span></div>
+                    <article class="process-step"><span class="process-step__icon material-symbols-outlined" aria-hidden="true">psychology</span><span class="process-step__index">01</span><h4>Entender</h4><p>Compreender os fundamentos.</p></article>
+                    <article class="process-step"><span class="process-step__icon material-symbols-outlined" aria-hidden="true">fitness_center</span><span class="process-step__index">02</span><h4>Praticar</h4><p>Aplicar o conteúdo imediatamente.</p></article>
+                    <article class="process-step"><span class="process-step__icon material-symbols-outlined" aria-hidden="true">deployed_code</span><span class="process-step__index">03</span><h4>Construir</h4><p>Transformar conhecimento em projeto.</p></article>
+                    <article class="process-step"><span class="process-step__icon material-symbols-outlined" aria-hidden="true">reviews</span><span class="process-step__index">04</span><h4>Receber feedback</h4><p>Identificar erros e oportunidades.</p></article>
+                    <article class="process-step"><span class="process-step__icon material-symbols-outlined" aria-hidden="true">trending_up</span><span class="process-step__index">05</span><h4>Evoluir</h4><p>Avançar com mais segurança.</p></article>
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+    <!-- Professores: retratos se expandem para a direita conforme o scroll -->
+    <section id="professores" class="faculty-showcase" aria-labelledby="faculty-title">
+        <div class="faculty-pin">
+            <div class="faculty-shell">
+                <header class="faculty-heading">
+                    <div>
+                        <span class="faculty-eyebrow">Quem ensina no DevClub</span>
+                        <h2 id="faculty-title">Professores que transformam experiência em direção.</h2>
+                    </div>
+                    <p>Um time próximo da prática, preparado para tornar conceitos técnicos mais claros e acompanhar cada etapa da evolução.</p>
+                </header>
+
+                <div class="faculty-stage" aria-label="Professores do DevClub">
+                    <article class="faculty-card">
+                        <img src="assets/professores/1781539057422.jpg" alt="Professor do DevClub" loading="lazy">
+                        <div class="faculty-card__caption"><span>Andrey Maya</span><small>Suporte</small></div>
+                    </article>
+                    <article class="faculty-card">
+                        <img src="assets/professores/fernanda-hd.png" alt="Fernanda, professora do DevClub" loading="lazy">
+                        <div class="faculty-card__caption"><span>Fernanda Costa</span><small>Professora LinkedIn</small></div>
+                    </article>
+                    <article class="faculty-card">
+                        <img src="assets/professores/matheus-hd.png" alt="Matheus, professor do DevClub" loading="lazy">
+                        <div class="faculty-card__caption"><span>Matheus Nogueira</span><small>automaçao e IA</small></div>
+                    </article>
+                    <article class="faculty-card">
+                        <img src="assets/professores/rod2.jpg" alt="Rodolfo Mori, professor e fundador do DevClub" loading="lazy">
+                        <div class="faculty-card__caption"><span>Rodolfo Mori</span><small>Professor e fundador</small></div>
+                    </article>
+                </div>
+
+                <div class="faculty-scroll-cue" aria-hidden="true">
+                    <span>Role para revelar</span><i></i><span class="material-symbols-outlined">east</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Depoimentos demonstrativos: substituir por relatos reais antes de publicar -->
+    <section id="depoimentos" class="testimonials-showcase" aria-labelledby="testimonials-title">
+        <div class="testimonials-shell">
+            <div class="testimonials-layout">
+                <header class="testimonials-intro">
+                    <span class="testimonials-eyebrow">Histórias de evolução</span>
+                    <h2 id="testimonials-title">Quando existe um caminho, aprender deixa de parecer impossível.</h2>
+                    <p>Relatos que ilustram como clareza, prática e constância podem transformar a experiência de quem estuda programação.</p>
+                    <div class="testimonials-disclaimer"><span class="material-symbols-outlined" aria-hidden="true">info</span><div><strong>Conteúdo demonstrativo</strong><small>Depoimentos fictícios para composição visual. Substitua por relatos reais antes de publicar.</small></div></div>
+                    <div class="testimonials-index" aria-hidden="true"><span>01</span><i></i><span>04</span></div>
+                </header>
+                <div class="testimonials-list">
+                    <article class="testimonial-card is-active"><div class="testimonial-card__top"><span class="testimonial-card__number">01 / 04</span><span class="testimonial-card__tag">Direção</span></div><span class="testimonial-card__quote-mark" aria-hidden="true">“</span><blockquote>Eu estudava por vídeos soltos e sentia que nunca avançava. Quando passei a seguir uma sequência e construir projetos, finalmente consegui enxergar minha evolução.</blockquote><footer class="testimonial-author"><span class="testimonial-author__avatar" aria-hidden="true">CR</span><div><strong>Camila Rocha</strong><small>Estudante em transição de carreira · relato fictício</small></div></footer></article>
+                    <article class="testimonial-card"><div class="testimonial-card__top"><span class="testimonial-card__number">02 / 04</span><span class="testimonial-card__tag testimonial-card__tag--purple">Prática</span></div><span class="testimonial-card__quote-mark" aria-hidden="true">“</span><blockquote>A diferença foi parar de apenas assistir e começar a construir. Cada exercício virou uma pequena prova de que eu realmente estava aprendendo.</blockquote><footer class="testimonial-author"><span class="testimonial-author__avatar" aria-hidden="true">LM</span><div><strong>Lucas Mendes</strong><small>Aluno de desenvolvimento web · relato fictício</small></div></footer></article>
+                    <article class="testimonial-card"><div class="testimonial-card__top"><span class="testimonial-card__number">03 / 04</span><span class="testimonial-card__tag">Clareza</span></div><span class="testimonial-card__quote-mark" aria-hidden="true">“</span><blockquote>Sempre achei lógica de programação complicada. Com explicações mais diretas e tempo para praticar, os conceitos começaram a fazer sentido de verdade.</blockquote><footer class="testimonial-author"><span class="testimonial-author__avatar" aria-hidden="true">MA</span><div><strong>Mariana Alves</strong><small>Estudante de programação · relato fictício</small></div></footer></article>
+                    <article class="testimonial-card"><div class="testimonial-card__top"><span class="testimonial-card__number">04 / 04</span><span class="testimonial-card__tag testimonial-card__tag--purple">Constância</span></div><span class="testimonial-card__quote-mark" aria-hidden="true">“</span><blockquote>Ter um próximo passo claro tornou minha rotina muito mais consistente. Em vez de procurar o que estudar, passei a usar meu tempo para aprender e aplicar.</blockquote><footer class="testimonial-author"><span class="testimonial-author__avatar" aria-hidden="true">JP</span><div><strong>João Pedro</strong><small>Aluno iniciante · relato fictício</small></div></footer></article>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Rodapé -->
+    <footer class="bg-surface-low border-t border-border-subtle w-full rounded-t-xxl mt-xxl relative z-10">
+        <div class="max-w-container-max mx-auto px-gutter py-xxl grid grid-cols-1 md:grid-cols-4 gap-xl">
+            <!-- Brand Column -->
+            <div class="flex flex-col gap-md">
+                <span class="text-2xl font-bold text-primary">DevClub</span>
+                <p class="text-sm text-text-secondary">Seu sistema de evolução em tecnologia.</p>
+                <p class="text-xs text-text-muted mt-auto pt-4">© 2026 DevClub. Todos os direitos reservados.</p>
+            </div>
+            
+            <!-- Links 1 -->
+            <div class="flex flex-col gap-sm">
+                <h4 class="text-sm font-bold text-text-primary mb-sm">Acesso rápido</h4>
+                <a class="text-sm text-text-muted hover:text-text-primary transition-colors hover:underline decoration-primary" href="#sobre">Sobre nós</a>
+                <a class="text-sm text-text-muted hover:text-text-primary transition-colors hover:underline decoration-primary" href="#">Nossos cursos</a>
+                <a class="text-sm text-text-muted hover:text-text-primary transition-colors hover:underline decoration-primary" href="#">Metodologia</a>
+                <a class="text-sm text-text-muted hover:text-text-primary transition-colors hover:underline decoration-primary" href="#">Suporte</a>
+            </div>
+
+            <!-- Links 2 -->
+            <div class="flex flex-col gap-sm">
+                <h4 class="text-sm font-bold text-text-primary mb-sm">Legal</h4>
+                <a class="text-sm text-text-muted hover:text-text-primary transition-colors hover:underline decoration-primary" href="#">Termos de Uso</a>
+                <a class="text-sm text-text-muted hover:text-text-primary transition-colors hover:underline decoration-primary" href="#">Política de Privacidade</a>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="flex flex-col gap-sm">
+                <h4 class="text-sm font-bold text-text-primary mb-sm">Newsletter</h4>
+                <p class="text-sm text-text-muted mb-xs">Receba dicas de carreira e novidades sobre tecnologia.</p>
+                <form class="flex mt-xs" onsubmit="event.preventDefault(); alert('Newsletter cadastrada com sucesso!');">
+                    <input class="bg-background border border-border-subtle text-text-primary font-mono text-sm rounded-l-lg px-md py-sm w-full focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="seu@email.com" type="email" required>
+                    <button class="bg-primary text-on-primary px-md py-sm rounded-r-lg font-semibold hover:bg-primary-fixed transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-sm">send</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script de Inicialização do Shader WebGL -->
+    <script src="js/shader.js"></script>
+    <!-- Script de Animações GSAP -->
+    <script src="js/animations.js?v=12"></script>
+</body>
+</html>
