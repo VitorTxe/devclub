@@ -718,87 +718,6 @@ function initMetricsAnimation() {
     const metricItems = gsap.utils.toArray(".metric-item", section);
     const metricNumbers = gsap.utils.toArray(".metric-number", section);
     const marqueeWrapper = section.querySelector(".metrics-marquee-wrapper");
-    const mm = gsap.matchMedia();
-
-    mm.add(
-        {
-            reduceMotion: "(prefers-reduced-motion: reduce)",
-            isMobile: "(max-width: 767px)"
-        },
-        (context) => {
-            const { reduceMotion, isMobile } = context.conditions;
-
-            if (reduceMotion) {
-                // Mostra os valores finais imediatamente
-                metricNumbers.forEach((el) => {
-                    const target = parseFloat(el.dataset.countTarget);
-                    el.textContent = formatMetric(target, el);
-                });
-                gsap.set([...metricItems, marqueeWrapper].filter(Boolean), { clearProps: "all" });
-                return;
-            }
-
-            // ── Estado inicial: invisível ──
-            gsap.set(metricItems, {
-                autoAlpha: 0,
-                y: isMobile ? 20 : 30
-            });
-            if (marqueeWrapper) {
-                gsap.set(marqueeWrapper, { autoAlpha: 0, y: 16 });
-            }
-
-            // ── Reveal dos metric items com stagger ──
-            const revealTl = gsap.timeline({
-                defaults: { ease: "power3.out" },
-                scrollTrigger: {
-                    id: "metrics-reveal",
-                    trigger: section,
-                    start: "top 82%",
-                    once: true
-                },
-                onComplete: () => {
-                    gsap.set(metricItems, { clearProps: "transform,opacity,visibility" });
-                }
-            });
-
-            revealTl.to(metricItems, {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.7,
-                stagger: 0.1
-            });
-
-            // ── CountUp dos números com proxy GSAP ──
-            metricNumbers.forEach((el, index) => {
-                const target = parseFloat(el.dataset.countTarget);
-                const decimals = parseInt(el.dataset.countDecimals || "0", 10);
-                const proxy = { value: 0 };
-
-                revealTl.to(proxy, {
-                    value: target,
-                    duration: 2,
-                    ease: "power2.out",
-                    onUpdate: () => {
-                        el.textContent = formatMetric(
-                            decimals > 0 ? parseFloat(proxy.value.toFixed(decimals)) : Math.round(proxy.value),
-                            el
-                        );
-                    }
-                }, index * 0.08);
-            });
-
-            // ── Reveal do marquee ──
-            if (marqueeWrapper) {
-                revealTl.to(marqueeWrapper, {
-                    autoAlpha: 1,
-                    y: 0,
-                    duration: 0.6,
-                    ease: "power3.out"
-                }, 0.35);
-            }
-        },
-        section
-    );
 
     /**
      * Formata o número de acordo com os data-attributes:
@@ -817,11 +736,83 @@ function initMetricsAnimation() {
             formatted = String(Math.round(value));
         }
 
-        // Aplicar separador de milhares
         if (separator && decimals === 0) {
             formatted = formatted.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
         }
 
         return prefix + formatted + suffix;
     }
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduceMotion) {
+        metricNumbers.forEach((el) => {
+            const target = parseFloat(el.dataset.countTarget);
+            el.textContent = formatMetric(target, el);
+        });
+        return;
+    }
+
+    const isMobile = window.innerWidth < 768;
+
+    // ── Estado inicial via GSAP ──
+    gsap.set(metricItems, { autoAlpha: 0, y: isMobile ? 20 : 30 });
+    if (marqueeWrapper) gsap.set(marqueeWrapper, { autoAlpha: 0, y: 16 });
+
+    // Seta os textos para zero (o HTML mostra os valores finais como fallback)
+    metricNumbers.forEach((el) => {
+        el.textContent = formatMetric(0, el);
+    });
+
+    // ── ScrollTrigger separado com onEnter ──
+    ScrollTrigger.create({
+        id: "metrics-countup",
+        trigger: section,
+        start: "top 85%",
+        once: true,
+        onEnter: () => {
+            // 1. Reveal dos items com stagger
+            gsap.to(metricItems, {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.7,
+                stagger: 0.1,
+                ease: "power3.out",
+                onComplete: () => gsap.set(metricItems, {
+                    clearProps: "transform,opacity,visibility"
+                })
+            });
+
+            // 2. CountUp de cada número com proxy independente
+            metricNumbers.forEach((el, index) => {
+                const target = parseFloat(el.dataset.countTarget);
+                const decimals = parseInt(el.dataset.countDecimals || "0", 10);
+                const proxy = { value: 0 };
+
+                gsap.to(proxy, {
+                    value: target,
+                    duration: 2.2,
+                    delay: index * 0.1,
+                    ease: "power2.out",
+                    onUpdate: () => {
+                        const current = decimals > 0
+                            ? parseFloat(proxy.value.toFixed(decimals))
+                            : Math.round(proxy.value);
+                        el.textContent = formatMetric(current, el);
+                    }
+                });
+            });
+
+            // 3. Reveal do marquee
+            if (marqueeWrapper) {
+                gsap.to(marqueeWrapper, {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 0.6,
+                    delay: 0.35,
+                    ease: "power3.out"
+                });
+            }
+        }
+    });
 }
