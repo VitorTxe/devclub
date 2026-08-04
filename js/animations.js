@@ -3,8 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
         gsap.registerPlugin(ScrollTrigger);
         window.initHeroMaskScroll?.();
+        initHeroBgParallax();
         initMetricsAnimation();
         initFormationsAnimation();
+        initComoFuncionaAnimation();
+        initSalarySectionAnimation();
         initAboutAnimation();
         initFacultyAnimation();
         initTestimonialsAnimation();
@@ -12,6 +15,25 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("GSAP ou ScrollTrigger não carregados na página. Lógica de animação desativada.");
     }
 });
+
+function initHeroBgParallax() {
+    const heroBg = document.querySelector("[data-hero-bg]");
+    if (!heroBg) return;
+
+    const orbs = gsap.utils.toArray(".hero-bg-orb", heroBg);
+    if (!orbs.length) return;
+
+    gsap.to(orbs, {
+        y: (i) => (i + 1) * -40,
+        ease: "none",
+        scrollTrigger: {
+            trigger: "#inicio",
+            start: "top top",
+            end: "bottom top",
+            scrub: 0.5
+        }
+    });
+}
 
 function initFormationsAnimation() {
     let mm = gsap.matchMedia();
@@ -73,6 +95,328 @@ function initFormationsAnimation() {
         });
     });
 
+}
+
+function initComoFuncionaAnimation() {
+    const section = document.querySelector("[data-method-section]");
+    if (!section) return;
+
+    const header = section.querySelector("[data-method-header]");
+    const title = header?.querySelector("h2");
+    const subtitle = header?.querySelector("p");
+    const line = section.querySelector("[data-method-line]");
+
+    const card1 = section.querySelector('[data-method-card][data-step="1"]');
+    const point1 = section.querySelector('[data-method-point][data-step="1"]');
+
+    const card2 = section.querySelector('[data-method-card][data-step="2"]');
+    const point2 = section.querySelector('[data-method-point][data-step="2"]');
+
+    const card3 = section.querySelector('[data-method-card][data-step="3"]');
+    const point3 = section.querySelector('[data-method-point][data-step="3"]');
+
+    const card4 = section.querySelector('[data-method-card][data-step="4"]');
+    const point4 = section.querySelector('[data-method-point][data-step="4"]');
+
+    const allElements = [title, subtitle, line, card1, point1, card2, point2, card3, point3, card4, point4].filter(Boolean);
+    if (!allElements.length) return;
+
+    const mm = gsap.matchMedia();
+
+    mm.add({
+        isMobile: "(max-width: 767px)",
+        isDesktop: "(min-width: 768px)",
+        reduceMotion: "(prefers-reduced-motion: reduce)"
+    }, (context) => {
+        const { isMobile, reduceMotion } = context.conditions;
+
+        if (reduceMotion) {
+            gsap.set(allElements, { clearProps: "all" });
+            if (line) gsap.set(line, { height: "100%" });
+            return;
+        }
+
+        // Configuração do estado inicial
+        if (title) gsap.set(title, { autoAlpha: 0, y: isMobile ? 20 : 30 });
+        if (subtitle) gsap.set(subtitle, { autoAlpha: 0, y: isMobile ? 16 : 24 });
+        if (line) gsap.set(line, { height: "0%" });
+
+        // Estado inicial dos cards (esquerda vs direita)
+        if (card1) gsap.set(card1, { autoAlpha: 0, x: isMobile ? -24 : -60 });
+        if (card2) gsap.set(card2, { autoAlpha: 0, x: isMobile ? 24 : 60 });
+        if (card3) gsap.set(card3, { autoAlpha: 0, x: isMobile ? -24 : -60 });
+        if (card4) gsap.set(card4, { autoAlpha: 0, x: isMobile ? 24 : 70, scale: 0.94 });
+
+        // Estado inicial dos pontos centrais
+        [point1, point2, point3].forEach((pt) => {
+            if (pt) gsap.set(pt, { autoAlpha: 0, scale: 0.2, transformOrigin: "center center" });
+        });
+        if (point4) gsap.set(point4, { autoAlpha: 0, scale: 0.1, transformOrigin: "center center" });
+
+        // Timeline ScrollTrigger sincronizada ao scroll (Scrub)
+        const tl = gsap.timeline({
+            defaults: { ease: "power2.out" },
+            scrollTrigger: {
+                id: "method-devpath-sequence",
+                trigger: section,
+                start: "top 85%",
+                end: "bottom 80%",
+                scrub: 0.5,
+                invalidateOnRefresh: true
+            }
+        });
+
+        // 1. Título da seção aparece
+        if (title) {
+            tl.to(title, { autoAlpha: 1, y: 0, duration: 0.35 });
+        }
+
+        // 2. Subtítulo aparece logo depois
+        if (subtitle) {
+            tl.to(subtitle, { autoAlpha: 1, y: 0, duration: 0.35 }, "-=0.15");
+        }
+
+        // 3. Linha vertical central começa a ser desenhada de cima para baixo
+        if (line) {
+            tl.to(line, { height: "100%", ease: "none", duration: 2.4 }, "lineStart");
+        }
+
+        // 4. Primeiro card da esquerda entra (surgindo da esquerda para a direita)
+        if (card1) {
+            tl.to(card1, { autoAlpha: 1, x: 0, duration: 0.45 }, "lineStart+=0.2");
+        }
+
+        // 5. Primeiro ponto central aparece
+        if (point1) {
+            tl.to(point1, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(1.7)" }, "lineStart+=0.4");
+        }
+
+        // 6. Segundo card da direita entra (surgindo da direita para a esquerda)
+        if (card2) {
+            tl.to(card2, { autoAlpha: 1, x: 0, duration: 0.45 }, "lineStart+=0.75");
+        }
+
+        // 7. Segundo ponto central aparece
+        if (point2) {
+            tl.to(point2, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(1.7)" }, "lineStart+=0.95");
+        }
+
+        // 8. Terceiro card da esquerda entra (surgindo da esquerda para a direita)
+        if (card3) {
+            tl.to(card3, { autoAlpha: 1, x: 0, duration: 0.45 }, "lineStart+=1.3");
+        }
+
+        // 9. Terceiro ponto central aparece
+        if (point3) {
+            tl.to(point3, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(1.7)" }, "lineStart+=1.5");
+        }
+
+        // 10. Card final da direita entra (com entrada um pouco mais marcante)
+        if (card4) {
+            tl.to(card4, { autoAlpha: 1, x: 0, scale: 1, duration: 0.55, ease: "power3.out" }, "lineStart+=1.85");
+        }
+
+        // 11. Marcador final com estrela aparece (pop vibrante)
+        if (point4) {
+            tl.to(point4, { autoAlpha: 1, scale: 1.15, duration: 0.45, ease: "back.out(2.2)" }, "lineStart+=2.1");
+        }
+
+        // 12. A composição permanece totalmente visível antes de o scroll continuar
+        tl.to({}, { duration: 0.4 });
+    }, section);
+}
+
+
+function initSalarySectionAnimation() {
+    const section = document.querySelector("[data-career-salary]") || document.querySelector("[data-salary-section]");
+    if (!section) return;
+
+    const eyebrow = section.querySelector("[data-career-header] .salary-section__eyebrow, [data-salary-heading] .salary-section__eyebrow");
+    const title = section.querySelector("#salary-title");
+    const subtitle = section.querySelector("[data-career-header] p, [data-salary-heading] p");
+
+    const lines = gsap.utils.toArray(section.querySelectorAll("[data-career-track-progress], [data-salary-progress-line]"));
+    const markerJunior = section.querySelector('[data-career-marker="junior"], [data-salary-marker="junior"]');
+    const markerPleno = section.querySelector('[data-career-marker="pleno"], [data-salary-marker="pleno"]');
+    const markerSenior = section.querySelector('[data-career-marker="senior"], [data-salary-marker="senior"]');
+
+    const cardJunior = section.querySelector('[data-career-card="junior"], [data-salary-level="junior"]');
+    const cardPleno = section.querySelector('[data-career-card="pleno"], [data-salary-level="pleno"]');
+    const cardSenior = section.querySelector('[data-career-card="senior"], [data-salary-level="senior"]');
+
+    const numbers = gsap.utils.toArray(section.querySelectorAll("[data-salary-number]"));
+    const comparison = section.querySelector("[data-career-comparison]") || section.querySelector("[data-salary-comparison]");
+    const tableMeters = gsap.utils.toArray(section.querySelectorAll(".salary-comparison table i"));
+    const disclaimer = section.querySelector("[data-career-disclaimer]") || section.querySelector("[data-salary-note]");
+
+    const allCards = [cardJunior, cardPleno, cardSenior].filter(Boolean);
+    const allMarkers = [markerJunior, markerPleno, markerSenior].filter(Boolean);
+    if (!allCards.length || !lines.length) return;
+
+    const originals = numbers.map((element) => element.textContent);
+    const format = (value) => Math.round(value).toLocaleString("pt-BR");
+    const mm = gsap.matchMedia();
+
+    mm.add({
+        mobile: "(max-width: 767px)",
+        desktop: "(min-width: 768px)",
+        reduceMotion: "(prefers-reduced-motion: reduce)"
+    }, (context) => {
+        const { mobile, reduceMotion } = context.conditions;
+        const visibleLines = lines.filter((line) => getComputedStyle(line.closest("svg")).display !== "none");
+        const listenerCleanups = [];
+
+        if (reduceMotion) {
+            gsap.set([eyebrow, title, subtitle, ...allMarkers, ...allCards, comparison, disclaimer].filter(Boolean), { clearProps: "all" });
+            visibleLines.forEach((line) => gsap.set(line, { strokeDasharray: "none", strokeDashoffset: 0 }));
+            tableMeters.forEach((meter) => gsap.set(meter, { width: meter.style.getPropertyValue("--salary-meter") || "100%" }));
+            numbers.forEach((element) => { element.textContent = format(Number(element.dataset.salaryValue)); });
+            return () => originals.forEach((value, index) => { numbers[index].textContent = value; });
+        }
+
+        // Estado inicial de visibilidade das linhas SVG (strokeDasharray)
+        visibleLines.forEach((line) => {
+            const length = line.getTotalLength();
+            gsap.set(line, { strokeDasharray: length, strokeDashoffset: length });
+        });
+
+        // Configuração inicial dos elementos para revelação limpa
+        if (eyebrow) gsap.set(eyebrow, { autoAlpha: 0, y: 16 });
+        if (title) gsap.set(title, { autoAlpha: 0, y: 24 });
+        if (subtitle) gsap.set(subtitle, { autoAlpha: 0, y: 18 });
+
+        allMarkers.forEach((mk) => gsap.set(mk, { autoAlpha: 0, scale: 0.3, transformOrigin: "center" }));
+        allCards.forEach((cd) => gsap.set(cd, { autoAlpha: 0, y: mobile ? 32 : 54, scale: 0.95 }));
+
+        if (comparison) gsap.set(comparison, { autoAlpha: 0, y: 30 });
+        if (disclaimer) gsap.set(disclaimer, { autoAlpha: 0, y: 16 });
+
+        // Prepara os meters de autonomia/complexidade/responsabilidade com largura 0
+        tableMeters.forEach((meter) => gsap.set(meter, { width: "0%" }));
+
+        // Contadores numéricos para os salários
+        const counters = numbers.map((element) => {
+            const state = { value: 0 };
+            element.textContent = "0";
+            return { element, state, target: Number(element.dataset.salaryValue) };
+        });
+
+        // Timeline ScrollTrigger sincronizada com a rolagem da página (Scrub)
+        const tl = gsap.timeline({
+            defaults: { ease: "power2.out" },
+            scrollTrigger: {
+                id: "career-salary-progression-timeline",
+                trigger: section,
+                start: "top 85%",
+                end: "bottom 75%",
+                scrub: 0.5,
+                invalidateOnRefresh: true
+            }
+        });
+
+        // 1. Título entra
+        if (eyebrow) tl.to(eyebrow, { autoAlpha: 1, y: 0, duration: 0.3 });
+        if (title) tl.to(title, { autoAlpha: 1, y: 0, duration: 0.4 }, "-=0.15");
+
+        // 2. Texto de apoio aparece
+        if (subtitle) tl.to(subtitle, { autoAlpha: 1, y: 0, duration: 0.35 }, "-=0.2");
+
+        // 3. Linha horizontal começa a ser desenhada de Júnior até Pleno (primeiro trecho ~45%)
+        if (visibleLines.length) {
+            tl.to(visibleLines, { strokeDashoffset: (i, target) => target.getTotalLength() * 0.55, duration: 0.8, ease: "none" }, "stepJunior");
+        }
+
+        // 4. Marcador Júnior aparece
+        if (markerJunior) {
+            tl.to(markerJunior, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(1.8)" }, "stepJunior+=0.2");
+        }
+
+        // 5. Card Júnior entra
+        if (cardJunior) {
+            tl.to(cardJunior, { autoAlpha: 1, y: 0, scale: 1, duration: 0.55 }, "stepJunior+=0.35");
+        }
+
+        // 6. Linha continua até Pleno (trecho médio ~85%)
+        if (visibleLines.length) {
+            tl.to(visibleLines, { strokeDashoffset: (i, target) => target.getTotalLength() * 0.15, duration: 0.8, ease: "none" }, "stepPleno");
+        }
+
+        // 7. Marcador Pleno aparece
+        if (markerPleno) {
+            tl.to(markerPleno, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(1.8)" }, "stepPleno+=0.2");
+        }
+
+        // 8. Card Pleno entra
+        if (cardPleno) {
+            tl.to(cardPleno, { autoAlpha: 1, y: 0, scale: 1, duration: 0.55 }, "stepPleno+=0.35");
+        }
+
+        // 9. Linha continua até Sênior (desenho total 100%)
+        if (visibleLines.length) {
+            tl.to(visibleLines, { strokeDashoffset: 0, duration: 0.8, ease: "none" }, "stepSenior");
+        }
+
+        // 10. Marcador Sênior aparece
+        if (markerSenior) {
+            tl.to(markerSenior, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(1.8)" }, "stepSenior+=0.2");
+        }
+
+        // 11. Card Sênior entra com um pouco mais de destaque (scale pop marcante)
+        if (cardSenior) {
+            tl.to(cardSenior, { autoAlpha: 1, y: 0, scale: 1.02, duration: 0.65, ease: "power3.out" }, "stepSenior+=0.35");
+        }
+
+        // 12. Valores salariais são revelados (contagem progressiva)
+        counters.forEach(({ element, state, target }) => {
+            tl.to(state, {
+                value: target,
+                duration: 0.6,
+                ease: "power2.out",
+                onUpdate: () => { element.textContent = format(state.value); }
+            }, "stepSenior+=0.5");
+        });
+
+        // 13. Tabela comparativa aparece
+        if (comparison) {
+            tl.to(comparison, { autoAlpha: 1, y: 0, duration: 0.5 }, "stepTable");
+        }
+
+        // 14. Barras de autonomia, complexidade e responsabilidade são preenchidas
+        tableMeters.forEach((meter) => {
+            const targetWidth = meter.style.getPropertyValue("--salary-meter") || "100%";
+            tl.to(meter, { width: targetWidth, duration: 0.5, ease: "power2.out" }, "stepTable+=0.2");
+        });
+
+        // 15. Observação final aparece
+        if (disclaimer) {
+            tl.to(disclaimer, { autoAlpha: 1, y: 0, duration: 0.4 }, "stepTable+=0.4");
+        }
+
+        // 16. A composição permanece totalmente visível antes de o scroll continuar
+        tl.to({}, { duration: 0.5 });
+
+        // Microinterações de Hover mantidas
+        allCards.forEach((card) => {
+            const levelKey = card.dataset.salaryLevel || card.dataset.careerCard;
+            const marker = section.querySelector(`[data-salary-marker="${levelKey}"], [data-career-marker="${levelKey}"]`);
+            if (!marker) return;
+            const activate = () => marker.classList.add("is-active");
+            const deactivate = () => marker.classList.remove("is-active");
+            ["pointerenter", "focus"].forEach((evt) => card.addEventListener(evt, activate));
+            ["pointerleave", "blur"].forEach((evt) => card.removeEventListener(evt, deactivate));
+            listenerCleanups.push(() => {
+                ["pointerenter", "focus"].forEach((evt) => card.removeEventListener(evt, activate));
+                ["pointerleave", "blur"].forEach((evt) => card.removeEventListener(evt, deactivate));
+                marker.classList.remove("is-active");
+            });
+        });
+
+        requestAnimationFrame(() => ScrollTrigger.refresh());
+        return () => {
+            listenerCleanups.forEach((cleanup) => cleanup());
+            originals.forEach((value, index) => { numbers[index].textContent = value; });
+        };
+    }, section);
 }
 
 function initAboutAnimation() {
