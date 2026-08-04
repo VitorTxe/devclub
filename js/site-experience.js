@@ -56,11 +56,6 @@ function initLenisScroll(reduceMotion) {
     };
 
     window.devclubScroll = controller;
-
-    if (document.body.classList.contains("intro-active")) {
-        controller.pause();
-    }
-
     window.addEventListener("load", () => {
         controller.resize();
         if (typeof ScrollTrigger !== "undefined") {

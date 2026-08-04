@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
-    initEntryIntro();
     // Registra o plugin ScrollTrigger no GSAP
     if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
         gsap.registerPlugin(ScrollTrigger);
+        window.initHeroMaskScroll?.();
         initMetricsAnimation();
         initFormationsAnimation();
         initAboutAnimation();
@@ -12,105 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("GSAP ou ScrollTrigger não carregados na página. Lógica de animação desativada.");
     }
 });
-
-function initEntryIntro() {
-    const intro = document.querySelector("[data-entry-intro]");
-    const word = document.querySelector("[data-entry-word]");
-
-    if (!intro || !word) {
-        document.body.classList.remove("intro-active");
-        return;
-    }
-
-    const eyebrow = intro.querySelector(".entry-intro__eyebrow");
-    const line = intro.querySelector(".entry-intro__line");
-    const wash = intro.querySelector(".entry-intro__wash");
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let isFinished = false;
-
-    const unlockSite = () => {
-        if (isFinished) return;
-        isFinished = true;
-        document.body.classList.remove("intro-active");
-        intro.style.display = "none";
-
-        if (typeof ScrollTrigger !== "undefined") {
-            ScrollTrigger.refresh();
-        }
-
-        window.devclubScroll?.resize();
-        window.devclubScroll?.resume();
-    };
-
-    if (typeof gsap === "undefined") {
-        unlockSite();
-        return;
-    }
-
-    if (reduceMotion) {
-        gsap.to(intro, {
-            autoAlpha: 0,
-            duration: 0.18,
-            onComplete: unlockSite
-        });
-        return;
-    }
-
-    gsap.set(eyebrow, { autoAlpha: 0, y: 14 });
-    gsap.set(word, { autoAlpha: 0, scale: 0.86, transformOrigin: "50% 50%" });
-    gsap.set(line, { autoAlpha: 0, scaleX: 0 });
-    gsap.set(wash, { autoAlpha: 0, scale: 1.16 });
-
-    const zoomScale = window.innerWidth < 640 ? 12 : 9;
-    const introTimeline = gsap.timeline({
-        defaults: { ease: "power3.out" },
-        onComplete: unlockSite
-    });
-
-    introTimeline
-        .addLabel("reveal")
-        .to(eyebrow, {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.55
-        }, "reveal")
-        .to(word, {
-            autoAlpha: 1,
-            scale: 1,
-            duration: 0.9,
-            ease: "power4.out"
-        }, "reveal+=0.08")
-        .to(line, {
-            autoAlpha: 1,
-            scaleX: 1,
-            duration: 0.75
-        }, "reveal+=0.28")
-        .addLabel("zoom", "+=0.24")
-        .to([eyebrow, line], {
-            autoAlpha: 0,
-            duration: 0.3
-        }, "zoom")
-        .to(word, {
-            scale: zoomScale,
-            duration: 1.45,
-            ease: "power4.inOut"
-        }, "zoom")
-        .to(wash, {
-            autoAlpha: 1,
-            scale: 1,
-            duration: 0.9,
-            ease: "power3.inOut"
-        }, "zoom+=0.58")
-        .to(word, {
-            autoAlpha: 0,
-            duration: 0.42
-        }, "zoom+=0.72")
-        .to(intro, {
-            autoAlpha: 0,
-            duration: 0.7,
-            ease: "power2.inOut"
-        }, "zoom+=1.16");
-}
 
 function initFormationsAnimation() {
     let mm = gsap.matchMedia();
@@ -662,55 +563,180 @@ function initFacultyAnimation() {
     );
 }
 function initTestimonialsAnimation() {
-    const section = document.querySelector(".testimonials-showcase");
+    const section = document.querySelector("[data-testimonials-scene]");
     if (!section) return;
 
-    const introItems = gsap.utils.toArray(".testimonials-intro > *", section);
-    const cards = gsap.utils.toArray(".testimonial-card", section);
-    const list = section.querySelector(".testimonials-list");
+    const sticky = section.querySelector(".testimonials-sticky");
+    const headingItems = gsap.utils.toArray(".testimonials-heading > *", section);
+    const cards = gsap.utils.toArray("[data-testimonial]", section);
+    const current = section.querySelector("[data-testimonials-current]");
+    const progressFill = section.querySelector("[data-testimonials-progress-fill]");
+    const cue = section.querySelector(".testimonials-scroll-cue");
+
+    if (!sticky || !headingItems.length || cards.length !== 4 || !current || !progressFill || !cue) return;
+
+    const setCurrent = (value) => {
+        current.textContent = String(value).padStart(2, "0");
+    };
+
     const mm = gsap.matchMedia();
 
-    mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set([...introItems, ...cards], { clearProps: "all" });
-    });
+    mm.add(
+        {
+            desktop: "(min-width: 1024px)",
+            mobile: "(max-width: 1023px)",
+            reduceMotion: "(prefers-reduced-motion: reduce)"
+        },
+        (context) => {
+            const { desktop, reduceMotion } = context.conditions;
+            section.classList.add("is-motion-ready");
 
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.fromTo(
-            introItems,
-            { autoAlpha: 0, y: 24 },
-            {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.65,
-                stagger: 0.08,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: section,
-                    start: "top 78%",
-                    once: true
-                }
+            if (reduceMotion) {
+                setCurrent(cards.length);
+                gsap.set([...headingItems, ...cards, progressFill], { clearProps: "all" });
+                gsap.set(progressFill, { scaleX: 1 });
+                return () => section.classList.remove("is-motion-ready");
             }
-        );
 
-        gsap.fromTo(
-            cards,
-            { autoAlpha: 0, y: 42 },
-            {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.72,
-                stagger: 0.12,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: list,
-                    start: "top 82%",
-                    once: true
-                }
+            setCurrent(1);
+            gsap.set(progressFill, { scaleX: 0, transformOrigin: "left center" });
+
+            if (desktop) {
+                const startStates = [
+                    { xPercent: -145, yPercent: -22, rotation: -2.2 },
+                    { xPercent: 145, yPercent: -18, rotation: 1.8 },
+                    { xPercent: -150, yPercent: 24, rotation: 1.4 },
+                    { xPercent: 145, yPercent: 28, rotation: -1.6 }
+                ];
+                const entryPositions = [0.18, 0.4, 0.62, 0.84];
+                const progressThresholds = [0.14, 0.3, 0.47, 0.63];
+                let visibleIndex = 1;
+                const holdState = { progress: 0 };
+
+                gsap.set(headingItems, { autoAlpha: 0, y: 30 });
+                gsap.set(cards, { autoAlpha: 0, scale: 0.9, transformOrigin: "center center" });
+                cards.forEach((card, index) => gsap.set(card, startStates[index]));
+
+                const timeline = gsap.timeline({
+                    defaults: { ease: "none" },
+                    scrollTrigger: {
+                        id: "testimonials-editorial-scene",
+                        trigger: section,
+                        start: "top top",
+                        end: () => `+=${Math.max(Math.round(window.innerHeight * 3.2), 2600)}`,
+                        pin: sticky,
+                        pinSpacing: true,
+                        scrub: 0.75,
+                        anticipatePin: 1,
+                        invalidateOnRefresh: true,
+                        onUpdate: (self) => {
+                            const nextIndex = Math.min(
+                                cards.length,
+                                Math.max(1, progressThresholds.filter((point) => self.progress >= point).length)
+                            );
+                            if (nextIndex !== visibleIndex) {
+                                visibleIndex = nextIndex;
+                                setCurrent(visibleIndex);
+                            }
+                        }
+                    }
+                });
+
+                timeline
+                    .addLabel("headingIn", 0)
+                    .to(headingItems, {
+                        autoAlpha: 1,
+                        y: 0,
+                        duration: 0.2,
+                        stagger: 0.035,
+                        ease: "power2.out"
+                    }, "headingIn")
+                    .to(cue, { autoAlpha: 0, y: 8, duration: 0.14, ease: "power2.out" }, 0.1)
+                    .to(progressFill, { scaleX: 1, duration: 1.04 }, 0.14);
+
+                cards.forEach((card, index) => {
+                    timeline.to(card, {
+                        autoAlpha: 1,
+                        xPercent: 0,
+                        yPercent: 0,
+                        scale: 1,
+                        rotation: 0,
+                        duration: 0.28,
+                        ease: "power2.out"
+                    }, entryPositions[index]);
+                });
+
+                timeline.to(holdState, { progress: 1, duration: 0.22 }, 1.13);
+
+                requestAnimationFrame(() => ScrollTrigger.refresh());
+
+                return () => {
+                    section.classList.remove("is-motion-ready");
+                    setCurrent(1);
+                };
             }
-        );
-    }, section);
+
+            gsap.fromTo(
+                headingItems,
+                { autoAlpha: 0, y: 28 },
+                {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 0.65,
+                    stagger: 0.07,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 78%",
+                        once: true
+                    }
+                }
+            );
+
+            cards.forEach((card, index) => {
+                gsap.fromTo(
+                    card,
+                    {
+                        autoAlpha: 0,
+                        xPercent: index % 2 === 0 ? -8 : 8,
+                        y: 56,
+                        scale: 0.96
+                    },
+                    {
+                        autoAlpha: 1,
+                        xPercent: 0,
+                        y: 0,
+                        scale: 1,
+                        duration: 0.72,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: card,
+                            start: "top 88%",
+                            once: true,
+                            onEnter: () => {
+                                setCurrent(index + 1);
+                                gsap.to(progressFill, {
+                                    scaleX: (index + 1) / cards.length,
+                                    duration: 0.3,
+                                    ease: "power2.out",
+                                    overwrite: true
+                                });
+                            }
+                        }
+                    }
+                );
+            });
+
+            requestAnimationFrame(() => ScrollTrigger.refresh());
+
+            return () => {
+                section.classList.remove("is-motion-ready");
+                setCurrent(1);
+            };
+        },
+        section
+    );
 }
-
 function initMetricsAnimation() {
     const section = document.querySelector(".metrics-section");
     if (!section) return;
@@ -718,6 +744,7 @@ function initMetricsAnimation() {
     const metricItems = gsap.utils.toArray(".metric-item", section);
     const metricNumbers = gsap.utils.toArray(".metric-number", section);
     const marqueeWrapper = section.querySelector(".metrics-marquee-wrapper");
+    const revealOwnedByHeroMask = Boolean(section.closest("[data-hero-mask-scene]"));
 
     /**
      * Formata o número de acordo com os data-attributes:
@@ -756,8 +783,10 @@ function initMetricsAnimation() {
     const isMobile = window.innerWidth < 768;
 
     // ── Estado inicial via GSAP ──
-    gsap.set(metricItems, { autoAlpha: 0, y: isMobile ? 20 : 30 });
-    if (marqueeWrapper) gsap.set(marqueeWrapper, { autoAlpha: 0, y: 16 });
+    if (!revealOwnedByHeroMask) {
+        gsap.set(metricItems, { autoAlpha: 0, y: isMobile ? 20 : 30 });
+        if (marqueeWrapper) gsap.set(marqueeWrapper, { autoAlpha: 0, y: 16 });
+    }
 
     // Seta os textos para zero (o HTML mostra os valores finais como fallback)
     metricNumbers.forEach((el) => {
@@ -772,16 +801,18 @@ function initMetricsAnimation() {
         once: true,
         onEnter: () => {
             // 1. Reveal dos items com stagger
-            gsap.to(metricItems, {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.7,
-                stagger: 0.1,
-                ease: "power3.out",
-                onComplete: () => gsap.set(metricItems, {
-                    clearProps: "transform,opacity,visibility"
-                })
-            });
+            if (!revealOwnedByHeroMask) {
+                gsap.to(metricItems, {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 0.7,
+                    stagger: 0.1,
+                    ease: "power3.out",
+                    onComplete: () => gsap.set(metricItems, {
+                        clearProps: "transform,opacity,visibility"
+                    })
+                });
+            }
 
             // 2. CountUp de cada número com proxy independente
             metricNumbers.forEach((el, index) => {
@@ -804,7 +835,7 @@ function initMetricsAnimation() {
             });
 
             // 3. Reveal do marquee
-            if (marqueeWrapper) {
+            if (marqueeWrapper && !revealOwnedByHeroMask) {
                 gsap.to(marqueeWrapper, {
                     autoAlpha: 1,
                     y: 0,
