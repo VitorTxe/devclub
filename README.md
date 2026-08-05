@@ -108,4 +108,4 @@ Como o projeto é construído em HTML5, Vanilla JavaScript e WebGL, você não p
 
 ## 💡 Licença & Créditos
 
-Desenvolvido por **DevClub** - Todos os direitos reservados.
+Desenvolvido por **Vitor Teixeira** - Todos os direitos reservados.
